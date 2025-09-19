@@ -77,11 +77,9 @@
 
 // export default MapContainer;
 
-import React from "react";
 import { MapContainer as LeafletMap, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import useMap from "../../hooks/useMap";
-import LoadingSpinner from "../common/LoadingSpinner";
 
 const MapContainer = ({ children }) => {
   const { onMapLoad } = useMap();

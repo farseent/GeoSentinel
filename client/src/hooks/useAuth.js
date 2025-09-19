@@ -1,18 +1,9 @@
-import { useContext } from "react";
-import { useAuthContext } from "../context/AuthContext";
+import { useAuth as useAuthFromContext } from "../context/AuthContext";
 
-// Custom hook for authentication
 const useAuth = () => {
-  const { user, loading, login, logout } = useAuthContext();
+  const { user, loading, login, logout, isAuthenticated } = useAuthFromContext();
 
-  // isAuthenticated = true if user object exists
-  return {
-    user,
-    loading,
-    isAuthenticated: !!user,
-    login,
-    logout,
-  };
+  return { user, loading, login, logout, isAuthenticated };
 };
 
 export default useAuth;

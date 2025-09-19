@@ -10,8 +10,8 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 
 const Home = () => {
-  const { user, isAuthenticated } = useAuth();
-  const { mapInstance, coordinates, setCoordinates } = useMap();
+  const { isAuthenticated } = useAuth();
+  const { coordinates, setCoordinates } = useMap();
   const { submitRequest, isSubmitting, error } = useRequests();
   
   const [selectedAOI, setSelectedAOI] = useState(null);

@@ -1,39 +1,111 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { getCurrentUser, logout as apiLogout } from "../utils/auth";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../utils/api';
 
 // Create the context
 const AuthContext = createContext();
 
 // AuthProvider to wrap around the app
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);        // { name, email, ... }
-  const [loading, setLoading] = useState(true);  // true while checking session
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Check for existing session on mount
+  // Check if user is logged in on app load
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const currUser = await getCurrentUser();
-      setUser(currUser);
-      setLoading(false);
-    })();
+    checkAuthStatus();
   }, []);
 
-  // Login handler
-  const login = (userData) => setUser(userData);
+  const checkAuthStatus = async () => {
+    try {
+      setLoading(true);
+      const response = await authAPI.checkAuth();
+      if (response.data.success) {
+        setUser(response.data.user);
+      }
+    } catch (error) {
+      console.log('Not authenticated');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Logout handler
+  const login = async (email, password) => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      const response = await authAPI.login({ email, password });
+      
+      if (response.data.success) {
+        setUser(response.data.user);
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Login failed';
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signup = async (name, email, password) => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      const response = await authAPI.signup({ name, email, password });
+      
+      if (response.data.success) {
+        setUser(response.data.user);
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Signup failed';
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
-    await apiLogout();
-    setUser(null);
+    try {
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+    }
+  };
+
+  const clearError = () => {
+    setError(null);
+  };
+
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    signup,
+    logout,
+    clearError,
+    isAuthenticated: !!user
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 // Hook to use AuthContext
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
