@@ -21,13 +21,22 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.checkAuth();
       if (response.data.success) {
         setUser(response.data.user);
+      } else {
+        setUser(null); // explicitly clear user if no success
       }
     } catch (error) {
-      console.log('Not authenticated');
+      if (error.response && error.response.status === 401) {
+        // Not logged in → that's fine, just set user = null
+        setUser(null);
+        console.log('User not logged in');
+      } else {
+        console.error("Auth check failed", error);
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   const login = async (email, password) => {
     try {
@@ -38,8 +47,14 @@ export const AuthProvider = ({ children }) => {
       
       if (response.data.success) {
         setUser(response.data.user);
+        console.log("Login success", response.data.user);
         return { success: true };
-      }
+      }else {
+      // backend responded but login failed
+        const message = response?.data?.message || "Invalid credentials";
+        console.error("Login failed:", message);
+        return { success: false, message };  // ✅ return added here
+     }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       setError(errorMessage);

@@ -43,7 +43,7 @@ exports.login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie('token', token, COOKIE_OPTIONS);
-    res.json({ message: 'Logged in', user: { id: user._id, name: user.name, email } });
+    res.json({ message: 'Logged in', user: { id: user._id, name: user.name, email }, "success": true });
   } catch (err) {
     next(err);
   }
@@ -52,4 +52,18 @@ exports.login = async (req, res, next) => {
 exports.logout = (req, res) => {
   res.clearCookie('token', COOKIE_OPTIONS);
   res.json({ message: 'Logged out' });
+};
+
+// Add this function to your authController.js
+
+exports.checkAuth = (req, res) => {
+  
+  if (!req.user) {
+    return res.json({ success: false, message: "Not authenticated", user: null });
+  }
+  const { _id, name, email, isAdmin } = req.user;
+  res.json({
+    success: true,
+    user: { id: _id, name, email, isAdmin }
+  });
 };

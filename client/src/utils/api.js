@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 // Base API configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -25,19 +24,26 @@ api.interceptors.request.use(
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle common errors
     if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
-      window.location.href = '/login';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
-    
     return Promise.reject(error);
   }
 );
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       // just reject, don’t force redirect
+//       console.warn("401 Unauthorized - user not logged in");
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 // Authentication API endpoints
 export const authAPI = {

@@ -21,7 +21,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
               {/* Add other routes here */}
             </Routes>
           </main>
