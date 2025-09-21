@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/ErrorMessage';
 
-const SignupForm = ({ onSuccess }) => {
+const SignupForm = () => {
+  const navigate = useNavigate();
   const { signup, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -77,7 +79,8 @@ const SignupForm = ({ onSuccess }) => {
     const result = await signup(formData.name, formData.email, formData.password);
     
     if (result.success) {
-      onSuccess?.();
+      // onSuccess?.();
+      navigate('/login', { state: { message: result.message } });
     }
   };
 

@@ -27,16 +27,16 @@ const Login = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">GeoSentinal</h1>
           <p className="text-gray-600">Earth Observation & Analysis Platform</p>
         </div>
-        
-        <LoginForm onSuccess={handleLoginSuccess} />
-        
         {location.state?.message && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-yellow-800 text-sm text-center">
               {location.state.message}
             </p>
           </div>
         )}
+        
+        <LoginForm onSuccess={handleLoginSuccess} />
+        
       </div>
     </div>
   );

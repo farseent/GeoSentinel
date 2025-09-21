@@ -18,14 +18,14 @@ exports.signup = async (req, res, next) => {
 
     const { name, email, password } = req.body;
     let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'Email already registered' });
+    if (user) return res.status(400).json({ success: false, message: 'Email already registered' });
 
     user = new User({ name, email, password });
     await user.save();
 
-    const token = generateToken(user);
-    res.cookie('token', token, COOKIE_OPTIONS);
-    res.status(201).json({ message: 'Signup successful', user: { id: user._id, name, email } });
+    // const token = generateToken(user);
+    // res.cookie('token', token, COOKIE_OPTIONS);
+    res.status(201).json({ success: true, message: 'Signup successful! Please log in.', user: { id: user._id, name, email } });
   } catch (err) {
     next(err);
   }
@@ -43,7 +43,7 @@ exports.login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie('token', token, COOKIE_OPTIONS);
-    res.json({ message: 'Logged in', user: { id: user._id, name: user.name, email }, "success": true });
+    res.json({ message: 'Logged in Succesfully!', user: { id: user._id, name: user.name, email }, "success": true });
   } catch (err) {
     next(err);
   }

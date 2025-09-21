@@ -47,8 +47,9 @@ export const AuthProvider = ({ children }) => {
       
       if (response.data.success) {
         setUser(response.data.user);
-        console.log("Login success", response.data.user);
-        return { success: true };
+        // console.log("Login success", response.data.user);
+        // console.log("Login message from backend", response.data.message);
+        return { success: true, message : response.data.message };
       }else {
       // backend responded but login failed
         const message = response?.data?.message || "Invalid credentials";
@@ -72,8 +73,8 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.signup({ name, email, password });
       
       if (response.data.success) {
-        setUser(response.data.user);
-        return { success: true };
+        // setUser(response.data.user);
+        return { success: true, message: response.data.message  };
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Signup failed';
