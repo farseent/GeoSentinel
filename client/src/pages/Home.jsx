@@ -66,7 +66,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
             🌍 GeoSentinal
           </h1>
@@ -78,7 +78,7 @@ const Home = () => {
               </span>
             )}
           </p>
-        </div>
+        </div> */}
 
         {/* Success Message */}
         {showSuccess && (
@@ -185,35 +185,6 @@ const Home = () => {
                 </p>
               )}
             </div>
-
-            {/* Instructions */}
-            {/* <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-medium text-gray-800 mb-3">
-                How to Use
-              </h3>
-              <ol className="text-sm text-gray-600 space-y-2">
-                <li className="flex items-start space-x-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center font-medium">1</span>
-                  <span>Log in to your account</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center font-medium">2</span>
-                  <span>Enable AOI selector</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center font-medium">3</span>
-                  <span>Draw a rectangle on the map</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center font-medium">4</span>
-                  <span>Select date range</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center justify-center font-medium">5</span>
-                  <span>Submit your request</span>
-                </li>
-              </ol>
-            </div> */}
           </div>
 
           {/* Map Section */}
@@ -259,39 +230,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
-        {/* Additional Information Section */}
-        {/* <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-3xl mb-3">🛰️</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Satellite Imagery
-            </h3>
-            <p className="text-sm text-gray-600">
-              Access high-resolution satellite imagery from multiple sources and time periods.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Change Analysis
-            </h3>
-            <p className="text-sm text-gray-600">
-              Analyze geographical changes over time with advanced image processing algorithms.
-            </p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md text-center">
-            <div className="text-3xl mb-3">⚡</div>
-            <h3 className="text-lg font-semibent text-gray-800 mb-2">
-              Fast Processing
-            </h3>
-            <p className="text-sm text-gray-600">
-              Get your analysis results quickly with our optimized processing pipeline.
-            </p>
-          </div>
-        </div> */}
       </main>
     </div>
   );

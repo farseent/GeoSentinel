@@ -2,4 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "leaflet/dist/leaflet.css";
+/* Make sure navbar / other UI sits above the map */
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1 !important;
+}
+
+/* Ensure your navbar stays above */
+.navbar,
+header,
+.your-navbar-class {
+  position: relative;
+  z-index: 9999 !important;
+}
+
