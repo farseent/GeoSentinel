@@ -1,90 +1,117 @@
-// // src/components/map/MapContainer.jsx
-// import React, { useEffect, useRef } from 'react';
-// import  useMap  from '../../hooks/useMap';
-// import LoadingSpinner from '../common/LoadingSpinner';
-
-// const MapContainer = ({ children }) => {
-//   const mapRef = useRef(null);
-//   const { initializeMap, mapInstance, isLoading, error } = useMap();
-
-//   useEffect(() => {
-//     if (mapRef.current && !mapInstance) {
-//       initializeMap(mapRef.current);
-//     }
-//   }, [initializeMap, mapInstance]);
-
-//   if (error) {
-//     return (
-//       <div className="h-full flex items-center justify-center bg-gray-100">
-//         <div className="text-center">
-//           <div className="text-4xl mb-4">🗺️</div>
-//           <h3 className="text-lg font-semibold text-gray-800 mb-2">
-//             Map Loading Error
-//           </h3>
-//           <p className="text-sm text-gray-600 max-w-sm">
-//             {error}
-//           </p>
-//           <button
-//             onClick={() => window.location.reload()}
-//             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-//           >
-//             Reload Page
-//           </button>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="relative h-full">
-//       {/* Map Container */}
-//       <div 
-//         ref={mapRef} 
-//         className="h-full w-full"
-//         style={{ minHeight: '400px' }}
-//       />
-      
-//       {/* Loading Overlay */}
-//       {isLoading && (
-//         <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center">
-//           <div className="text-center">
-//             <LoadingSpinner size="lg" />
-//             <p className="mt-2 text-sm text-gray-600">Loading map...</p>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Map Controls and Overlays */}
-//       {mapInstance && children}
-
-//       {/* Default Map Message */}
-//       {!isLoading && !mapInstance && (
-//         <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-//           <div className="text-center">
-//             <div className="text-4xl mb-4">🌍</div>
-//             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-//               Global Map View
-//             </h3>
-//             <p className="text-sm text-gray-600">
-//               Interactive satellite imagery map
-//             </p>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default MapContainer;
-
-import { MapContainer as LeafletMap, TileLayer } from "react-leaflet";
+import { MapContainer as LeafletMap, TileLayer, FeatureGroup } from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
+import "leaflet-draw/dist/leaflet.draw.css";
+import useAuth from "../../hooks/useAuth";
 import useMap from "../../hooks/useMap";
+import { useEffect, useRef } from "react";
 
-const MapContainer = ({ children }) => {
-  const { onMapLoad } = useMap();
+const MapContainer = () => {
+  const { isAuthenticated } = useAuth();
+  const { aoi, setAoi, setCoordinates, onMapLoad } = useMap();
+  const featureGroupRef = useRef();
 
-  // You can add loading state if you want, but React-Leaflet handles map rendering itself
+  const _onCreated = (e) => {
+    const layer = e.layer;
+    const bounds = layer.getBounds();
+
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+    const nw = [ne.lat, sw.lng];
+    const se = [sw.lat, ne.lng];
+
+    const coordinates = [
+      [sw.lng, sw.lat],
+      [se[1], se[0]],
+      [ne.lng, ne.lat],
+      [nw[1], nw[0]],
+      [sw.lng, sw.lat]
+    ];
+
+    // Area calculation (rough km²)
+    const earthRadius = 6371;
+    const latDiff = Math.abs(ne.lat - sw.lat);
+    const lngDiff = Math.abs(ne.lng - sw.lng);
+    const meanLat = (ne.lat + sw.lat) / 2;
+    const area =
+      latDiff * (Math.PI / 180) * earthRadius *
+      lngDiff * (Math.PI / 180) * earthRadius *
+      Math.cos(meanLat * Math.PI / 180);
+
+    setAoi({
+      type: "rectangle",
+      coordinates,
+      bounds: {
+        north: ne.lat,
+        south: sw.lat,
+        east: ne.lng,
+        west: sw.lng,
+      },
+      area: Math.abs(area),
+    });
+    setCoordinates(coordinates);
+  };
+
+  const _onDeleted = (e) => {
+    // Clear AOI when shapes are deleted
+    setAoi(null);
+    setCoordinates(null);
+  };
+
+  const _onEdited = (e) => {
+    // Handle shape editing if needed
+    const layers = e.layers;
+    layers.eachLayer((layer) => {
+      if (layer.getBounds) {
+        // Recalculate AOI data for edited rectangle
+        const bounds = layer.getBounds();
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+        const nw = [ne.lat, sw.lng];
+        const se = [sw.lat, ne.lng];
+
+        const coordinates = [
+          [sw.lng, sw.lat],
+          [se[1], se[0]],
+          [ne.lng, ne.lat],
+          [nw[1], nw[0]],
+          [sw.lng, sw.lat]
+        ];
+
+        const earthRadius = 6371;
+        const latDiff = Math.abs(ne.lat - sw.lat);
+        const lngDiff = Math.abs(ne.lng - sw.lng);
+        const meanLat = (ne.lat + sw.lat) / 2;
+        const area =
+          latDiff * (Math.PI / 180) * earthRadius *
+          lngDiff * (Math.PI / 180) * earthRadius *
+          Math.cos(meanLat * Math.PI / 180);
+
+        setAoi({
+          type: "rectangle",
+          coordinates,
+          bounds: {
+            north: ne.lat,
+            south: sw.lat,
+            east: ne.lng,
+            west: sw.lng,
+          },
+          area: Math.abs(area),
+        });
+        setCoordinates(coordinates);
+      }
+    });
+  };
+
+  // Clear layers when AOI is cleared from outside
+  useEffect(() => {
+    if (!aoi && featureGroupRef.current) {
+      const layers = featureGroupRef.current.getLayers();
+      layers.forEach((layer) => {
+        featureGroupRef.current.removeLayer(layer);
+      });
+    }
+  }, [aoi]);
 
   return (
     <div className="relative h-full w-full" style={{ minHeight: "400px" }}>
@@ -93,13 +120,56 @@ const MapContainer = ({ children }) => {
         zoom={6}
         style={{ height: "100%", width: "100%" }}
         whenCreated={onMapLoad}
+        zoomControl = { false }
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
-        {children}
+
+        {isAuthenticated && (
+          <FeatureGroup ref={featureGroupRef}>
+            <EditControl
+              position="topright"
+              draw={{
+                rectangle: {
+                  shapeOptions: {
+                    color: '#3b82f6',
+                    fillColor: '#3b82f6',
+                    fillOpacity: 0.2,
+                    weight: 3
+                  }
+                },
+                polygon: false,
+                circle: false,
+                polyline: false,
+                marker: false,
+                circlemarker: false
+              }}
+              edit={{
+                remove: true,
+                edit: true
+              }}
+              onCreated={_onCreated}
+              onDeleted={_onDeleted}
+              onEdited={_onEdited}
+            />
+          </FeatureGroup>
+        )}
       </LeafletMap>
+      
+      {/* AOI Selected Overlay */}
+      {isAuthenticated && aoi && (
+        <div className="absolute bottom-4 left-4 bg-white bg-opacity-95 border border-green-300 p-3 rounded-lg shadow-lg z-10">
+          <div className="flex items-center space-x-2 mb-1">
+            <span className="text-lg">✅</span>
+            <span className="text-sm font-medium text-green-800">AOI Selected</span>
+          </div>
+          <div className="text-xs text-green-700">
+            Area: {aoi.area?.toFixed(2)} km² • Use the delete tool (🗑️) to remove or edit tool (✏️) to modify.
+          </div>
+        </div>
+      )}
     </div>
   );
 };

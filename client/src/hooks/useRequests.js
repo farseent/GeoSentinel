@@ -10,20 +10,20 @@ const useRequests = () => {
   const [error, setError] = useState(null);
 
   // Fetch all user requests
-  const fetchRequests = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const res = await api.get("/requests/my");
-      setRequests(res.data || []);
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch requests");
-      setRequests([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchRequests = async () => {
+  //   if (!user) return;
+  //   setLoading(true);
+  //   try {
+  //     const res = await api.get("/requests/my");
+  //     setRequests(res.data || []);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError(err.response?.data?.message || "Failed to fetch requests");
+  //     setRequests([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Submit a new request (AOI + dateRange)
   const submitRequest = async ({ aoi, dateRange }) => {
@@ -41,16 +41,16 @@ const useRequests = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRequests();
-    // eslint-disable-next-line
-  }, [user]);
+  // useEffect(() => {
+  //   fetchRequests();
+  //   // eslint-disable-next-line
+  // }, [user]);
 
   return {
     requests,
     loading,
     error,
-    fetchRequests,
+    // fetchRequests,
     submitRequest,
   };
 };

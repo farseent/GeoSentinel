@@ -23,27 +23,27 @@ api.interceptors.request.use(
 );
 
 // Response interceptor
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 // api.interceptors.response.use(
 //   (response) => response,
 //   (error) => {
 //     if (error.response?.status === 401) {
-//       // just reject, don’t force redirect
-//       console.warn("401 Unauthorized - user not logged in");
+//       if (window.location.pathname !== '/login') {
+//         window.location.href = '/login';
+//       }
 //     }
 //     return Promise.reject(error);
 //   }
 // );
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // just reject, don’t force redirect
+      console.warn("401 Unauthorized - user not logged in");
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Authentication API endpoints
 export const authAPI = {

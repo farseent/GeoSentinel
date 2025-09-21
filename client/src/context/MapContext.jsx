@@ -3,9 +3,14 @@ import React, { createContext, useContext, useState, useRef } from "react";
 const MapContext = createContext();
 
 export const MapProvider = ({ children }) => {
-  // AOI and date state
+  // AOI and coordinates state
   const [aoi, setAoi] = useState(null);
+  const [coordinates, setCoordinates] = useState(null);
+  
+  // Date range state
   const [dateRange, setDateRange] = useState({ from: null, to: null });
+  
+  // AOI enabled state
   const [aoiEnabled, setAoiEnabled] = useState(false);
 
   // Store map instance
@@ -16,14 +21,37 @@ export const MapProvider = ({ children }) => {
     mapRef.current = mapInstance;
   };
 
+  // Helper function to clear all AOI data
+  const clearAOI = () => {
+    setAoi(null);
+    setCoordinates(null);
+  };
+
   return (
     <MapContext.Provider
       value={{
-        aoi, setAoi,
-        dateRange, setDateRange,
-        aoiEnabled, setAoiEnabled,
-        map: mapRef,         // Expose map ref to consumers
-        onMapLoad: handleMapLoad // Pass this to React-Leaflet's whenCreated
+        // AOI state
+        aoi, 
+        setAoi,
+        
+        // Coordinates state  
+        coordinates, 
+        setCoordinates,
+        
+        // Date range state
+        dateRange, 
+        setDateRange,
+        
+        // AOI enabled state
+        aoiEnabled, 
+        setAoiEnabled,
+        
+        // Map instance
+        map: mapRef,
+        onMapLoad: handleMapLoad,
+        
+        // Helper functions
+        clearAOI
       }}
     >
       {children}
