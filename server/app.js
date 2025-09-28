@@ -11,6 +11,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
+app.use('/api/requests', require('./routes/requests'));
 
 // Add request routes later
 

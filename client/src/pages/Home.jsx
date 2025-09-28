@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import useMap from '../hooks/useMap';
 import useRequests from '../hooks/useRequests';
 import MapContainer from '../components/map/MapContainer';
 import DateRangePicker from '../components/map/DateRangePicker';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import SuccessMessage from "../components/common/SuccessMessage";
 import ErrorMessage from '../components/common/ErrorMessage';
 
 const Home = () => {
@@ -17,6 +18,8 @@ const Home = () => {
     endDate: ''
   });
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
 
   const handleDateChange = (dates) => {
     setDateRange(dates);
@@ -25,35 +28,48 @@ const Home = () => {
   const handleClearAOI = () => {
     setAoi(null);
     setCoordinates(null);
-    
-    // Also clear from map if needed
-    // This will be handled by the MapContainer component
   };
 
-  const handleSubmitRequest = async () => {
-    if (!aoi || !dateRange.startDate || !dateRange.endDate) {
-      return;
-    }
+  const getBoundsFromCoordinates = (coords) => {
+  const lats = coords.map(c => c[1]); // latitude values
+  const lngs = coords.map(c => c[0]); // longitude values
+  return {
+    north: Math.max(...lats),
+    south: Math.min(...lats),
+    east: Math.max(...lngs),
+    west: Math.min(...lngs),
+  };
+};
 
-    const requestData = {
-      aoi: aoi,
-      dateRange: dateRange,
-      coordinates: coordinates
-    };
+const handleSubmitRequest = async () => {
+  if (!coordinates || !dateRange.startDate || !dateRange.endDate) {
+    return;
+  }
+  const bounds = getBoundsFromCoordinates(coordinates);
 
-    try {
-      await submitRequest(requestData);
-      setShowSuccess(true);
-      setAoi(null);
-      setDateRange({ startDate: '', endDate: '' });
-      setCoordinates(null);
-      setTimeout(() => setShowSuccess(false), 5000);
-    } catch (err) {
-      console.error('Failed to submit request:', err);
-    }
+  const requestData = {
+    coordinates: bounds,
+    dateFrom: dateRange.startDate,
+    dateTo: dateRange.endDate,
   };
 
-  const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || isSubmitting;
+  const result = await submitRequest(requestData);
+
+  if (result.success) {
+    setSuccessMessage(result.message); // backend message
+    setShowSuccess(true);
+
+    setAoi(null);
+    setDateRange({ startDate: "", endDate: "" });
+    setCoordinates(null);
+
+    setTimeout(() => setShowSuccess(false), 5000);
+  } else {
+    console.error("Request failed:", result.message);
+  }
+};
+
+const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || isSubmitting;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -74,21 +90,10 @@ const Home = () => {
 
         {/* Success Message */}
         {showSuccess && (
-          <div className="mb-6 mx-auto max-w-md">
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-              <span className="block sm:inline">Request submitted successfully!</span>
-              <button
-                className="absolute top-0 bottom-0 right-0 px-4 py-3"
-                onClick={() => setShowSuccess(false)}
-              >
-                <span className="sr-only">Close</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+      <div className="mb-6 mx-auto max-w-md">
+          <SuccessMessage message={successMessage} onClose={() => setShowSuccess(false)} />
+      </div>
+    )}
 
         {/* Error Message */}
         {error && (

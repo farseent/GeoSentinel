@@ -26,20 +26,22 @@ const useRequests = () => {
   // };
 
   // Submit a new request (AOI + dateRange)
-  const submitRequest = async ({ aoi, dateRange }) => {
-    setLoading(true);
-    try {
-      const res = await api.post("/requests", { aoi, dateRange });
-      setRequests(prev => [res.data, ...prev]); // Optimistically prepend
-      setError(null);
-      return { success: true, data: res.data };
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to submit request");
-      return { success: false, error: err };
-    } finally {
-      setLoading(false);
-    }
-  };
+  const submitRequest = async ({ coordinates, dateFrom, dateTo }) => {
+  setLoading(true);
+  try {
+    const res = await api.post("/requests", { coordinates, dateFrom, dateTo });
+    setRequests(prev => [res.data.request, ...prev]); // store new request
+    setError(null);
+    return { success: true, message: res.data.message, data: res.data.request };
+  } catch (err) {
+    const errMsg = err.response?.data?.message || "Failed to submit request";
+    setError(errMsg);
+    return { success: false, message: errMsg, error: err };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // useEffect(() => {
   //   fetchRequests();
