@@ -25,7 +25,7 @@ const MapContainer = () => {
       [se[1], se[0]],
       [ne.lng, ne.lat],
       [nw[1], nw[0]],
-      [sw.lng, sw.lat]
+      [sw.lng, sw.lat],
     ];
 
     // Area calculation (rough km²)
@@ -52,18 +52,16 @@ const MapContainer = () => {
     setCoordinates(coordinates);
   };
 
-  const _onDeleted = (e) => {
+  const _onDeleted = () => {
     // Clear AOI when shapes are deleted
     setAoi(null);
     setCoordinates(null);
   };
 
   const _onEdited = (e) => {
-    // Handle shape editing if needed
     const layers = e.layers;
     layers.eachLayer((layer) => {
       if (layer.getBounds) {
-        // Recalculate AOI data for edited rectangle
         const bounds = layer.getBounds();
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
@@ -75,7 +73,7 @@ const MapContainer = () => {
           [se[1], se[0]],
           [ne.lng, ne.lat],
           [nw[1], nw[0]],
-          [sw.lng, sw.lat]
+          [sw.lng, sw.lat],
         ];
 
         const earthRadius = 6371;
@@ -120,12 +118,26 @@ const MapContainer = () => {
         zoom={6}
         style={{ height: "100%", width: "100%" }}
         whenCreated={onMapLoad}
-        zoomControl = { false }
+        zoomControl={false}
       >
+        {/* ESRI World Imagery (satellite) */}
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution="Tiles © Esri, Maxar, Earthstar Geographics"
         />
+        <TileLayer
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+          attribution="Esri, USGS"
+          opacity={1.0}
+        />
+
+        {/* OSM overlay for labels/roads */}
+        {/* <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
+          opacity={0.1}
+        /> */}
+        
 
         {isAuthenticated && (
           <FeatureGroup ref={featureGroupRef}>
@@ -134,21 +146,21 @@ const MapContainer = () => {
               draw={{
                 rectangle: {
                   shapeOptions: {
-                    color: '#3b82f6',
-                    fillColor: '#3b82f6',
+                    color: "#3b82f6",
+                    fillColor: "#3b82f6",
                     fillOpacity: 0.2,
-                    weight: 3
-                  }
+                    weight: 3,
+                  },
                 },
                 polygon: false,
                 circle: false,
                 polyline: false,
                 marker: false,
-                circlemarker: false
+                circlemarker: false,
               }}
               edit={{
                 remove: true,
-                edit: true
+                edit: true,
               }}
               onCreated={_onCreated}
               onDeleted={_onDeleted}
@@ -157,7 +169,7 @@ const MapContainer = () => {
           </FeatureGroup>
         )}
       </LeafletMap>
-      
+
       {/* AOI Selected Overlay */}
       {isAuthenticated && aoi && (
         <div className="absolute bottom-4 left-4 bg-white bg-opacity-95 border border-green-300 p-3 rounded-lg shadow-lg z-10">
