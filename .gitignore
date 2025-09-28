@@ -230,3 +230,4 @@ $RECYCLE.BIN/
 *.f4p
 *.f4a
 *.f4b
+client/src/components/map/MapContainer2.jsx
