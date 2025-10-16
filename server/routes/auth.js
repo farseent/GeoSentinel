@@ -8,5 +8,7 @@ router.post('/signup', signupValidation, authController.signup);
 router.post('/login', loginValidation, authController.login);
 router.post('/logout', authController.logout);
 router.get('/me',authMiddleware, authController.checkAuth);
+router.get("/verify/:token", authController.verifyEmail);
+
 
 module.exports = router;
