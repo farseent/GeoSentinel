@@ -58,9 +58,11 @@ export const RequestProvider = ({ children }) => {
   const deleteRequest = async (requestId) => {
     setLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null); // Clear success/error before delete attempt
     try {
-      await requestsAPI.delete(requestId);
+      const res = await requestsAPI.delete(requestId);
       setRequests((prev) => prev.filter((req) => req._id !== requestId));
+      setSuccessMessage(res.data.message); // Optional: Add success message here too
       return { success: true };
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
