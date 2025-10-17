@@ -61,34 +61,53 @@ exports.verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.params;
 
-    // Decode and verify token
+    // 1. Decode token to get the email
     const decoded = jwt.verify(token, JWT_SECRET);
+    
+    // 2. Find the user by the email in the token
+    const user = await User.findOne({ email: decoded.email });
 
-    // Find user matching token and within expiry
-    const user = await User.findOne({
-      email: decoded.email,
-      verificationToken: token,
-      verificationTokenExpires: { $gt: Date.now() },
-    });
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+    }
 
-    if (!user)
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired verification token',
-      });
+    // 3. Handle Already Verified Case (Returns the standard success message)
+    if (user.isVerified) {
+        console.log(`✅ Email for ${user.email} is already verified.`);
+        // RETURN THE SAME MESSAGE AS THE FIRST SUCCESS
+        return res.status(200).json({
+            success: true,
+            message: 'Email verified successfully. You can now log in.', 
+        });
+    }
 
-    // Mark email as verified
+    // 4. Handle Invalid/Expired Token for UNVERIFIED Users
+    const isTokenValid = user.verificationToken === token && user.verificationTokenExpires && user.verificationTokenExpires > Date.now();
+
+    if (!isTokenValid) {
+        console.log(`❌ Invalid/Expired token attempt for ${user.email}.`);
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid or expired verification token',
+        });
+    }
+
+    // 5. Final Verification (Only runs if token is valid and user is NOT verified)
     user.isVerified = true;
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save();
+    
+    console.log(`✅ Email for ${user.email} verified successfully.`);
 
+    // RETURN THE STANDARD SUCCESS MESSAGE
     res.status(200).json({
       success: true,
       message: 'Email verified successfully. You can now log in.',
     });
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ JWT/General Error:", err.message);
     res.status(400).json({ success: false, message: 'Invalid or expired token' });
   }
 };
@@ -100,8 +119,9 @@ exports.login = async (req, res, next) => {
 
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user || !(await user.matchPassword(password)))
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user)
+      return res.status(401).json({ message: 'User not found' });
+    
     // 🔑 NEW: Check if the user's email is verified
     if (!user.isVerified) {
       return res.status(401).json({ 
@@ -109,6 +129,10 @@ exports.login = async (req, res, next) => {
         message: 'Your email is not verified. Please check your inbox for the verification link.' 
       });
     }
+
+    if(!(await user.matchPassword(password)))
+      return res.status(401).json({message:'Invalid credentials'})
+
     const token = generateToken(user);
     res.cookie('token', token, COOKIE_OPTIONS);
     res.json({ message: 'Logged in Succesfully!', user: { id: user._id, name: user.name, email }, "success": true });
