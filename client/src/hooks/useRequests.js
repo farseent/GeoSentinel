@@ -5,27 +5,33 @@ const useRequest = () => {
   const {
     requests,
     loading,
-    error,
     stats,
+    errorMessage,
+    successMessage,
     loadingStats,
     getRequestStats,
     fetchMyRequests,
     createRequest,
     deleteRequest,
     setRequests,
+    clearSuccessMessage, 
+    clearErrorMessage,
   } = useRequestContext();
 
   return {
     requests,
     loading,
-    error,
     stats,
+    errorMessage,
+    successMessage,
     loadingStats,
     getRequestStats,
     fetchMyRequests,
     createRequest,
     deleteRequest,
     setRequests,
+    clearSuccessMessage, 
+    clearErrorMessage,
   };
 };
 

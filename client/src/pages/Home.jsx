@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import useMap from '../hooks/useMap';
 import useRequests from '../hooks/useRequests';
@@ -11,15 +11,12 @@ import ErrorMessage from '../components/common/ErrorMessage';
 const Home = () => {
   const { isAuthenticated } = useAuth();
   const { aoi, setAoi, coordinates, setCoordinates } = useMap();
-  const { createRequest, isSubmitting, error } = useRequests();
+  const { createRequest, isSubmitting, errorMessage, successMessage, clearErrorMessage, clearSuccessMessage } = useRequests();
 
   const [dateRange, setDateRange] = useState({
     startDate: '',
     endDate: ''
   });
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-
 
   const handleDateChange = (dates) => {
     setDateRange(dates);
@@ -56,18 +53,27 @@ const handleSubmitRequest = async () => {
   const result = await createRequest(requestData);
 
   if (result.success) {
-    setSuccessMessage(result.message); // backend message
-    setShowSuccess(true);
-
     setAoi(null);
     setDateRange({ startDate: "", endDate: "" });
     setCoordinates(null);
-
-    setTimeout(() => setShowSuccess(false), 5000);
   } else {
     console.error("Request failed:", result.message);
   }
 };
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => clearSuccessMessage(), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, clearSuccessMessage]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => clearErrorMessage(), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage, clearErrorMessage]);
 
 const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || isSubmitting;
 
@@ -89,16 +95,16 @@ const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || i
         </div>
 
         {/* Success Message */}
-        {showSuccess && (
-      <div className="mb-6 mx-auto max-w-md">
-          <SuccessMessage message={successMessage} onClose={() => setShowSuccess(false)} />
-      </div>
-    )}
+        {successMessage && (
+          <div className="mb-6 mx-auto max-w-md">
+              <SuccessMessage message={successMessage} onClose={ clearSuccessMessage }/>
+          </div>
+        )}
 
         {/* Error Message */}
-        {error && (
-          <div className="mb-6">
-            <ErrorMessage message={error} />
+        {errorMessage && (
+          <div className="mb-6 mx-auto max-w-md">
+            <ErrorMessage message={errorMessage} onClose={ clearErrorMessage }/>
           </div>
         )}
 

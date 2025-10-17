@@ -6,20 +6,28 @@ const RequestContext = createContext();
 export const RequestProvider = ({ children }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(false);
 
+  const clearSuccessMessage = useCallback(() => {
+    setSuccessMessage(null);
+  }, []);
+
+  const clearErrorMessage = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
 
   // ✅ Fetch all requests for the current user
   const fetchMyRequests = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
     try {
       const res = await requestsAPI.getMyRequests();
       setRequests(res.data.requests || []);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      setErrorMessage(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -28,15 +36,18 @@ export const RequestProvider = ({ children }) => {
   // ✅ Create a new AOI request
   const createRequest = async (payload) => {
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
+    setSuccessMessage(null);
     try {
       const res = await requestsAPI.create(payload);
       const newRequest = res.data.request;
-      setRequests((prev) => [newRequest, ...prev]);
+      setRequests((prev) => [newRequest, ...prev]);      
+      setSuccessMessage(res.data.message)
       return { success: true, request: newRequest };
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
-      setError(msg);
+      setErrorMessage(msg);
+      setSuccessMessage(null);
       return { success: false, error: msg };
     } finally {
       setLoading(false);
@@ -46,14 +57,14 @@ export const RequestProvider = ({ children }) => {
   // ✅ Delete a request
   const deleteRequest = async (requestId) => {
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
     try {
       await requestsAPI.delete(requestId);
       setRequests((prev) => prev.filter((req) => req._id !== requestId));
       return { success: true };
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
-      setError(msg);
+      setErrorMessage(msg);
       return { success: false, error: msg };
     } finally {
       setLoading(false);
@@ -63,14 +74,14 @@ export const RequestProvider = ({ children }) => {
 
 const getRequestStats = useCallback(async () => {
   setLoadingStats(true);
-  setError(null);
+  setErrorMessage(null);
   try {
     const res = await requestsAPI.getRequestStats(); // ✅ Axios returns res.data directly
     setStats(res.data);
     return res.data;
   } catch (err) {
     const msg = err.response?.data?.message || err.message;
-    setError(msg);
+    setErrorMessage(msg);
     return null;
   } finally {
     setLoadingStats(false);
@@ -88,14 +99,17 @@ const getRequestStats = useCallback(async () => {
       value={{
         requests,
         loading,
-        error,
         stats,
+        errorMessage,
+        successMessage,
         loadingStats,
         getRequestStats,
         fetchMyRequests,
         createRequest,
         deleteRequest,
         setRequests,
+        clearSuccessMessage, 
+        clearErrorMessage,
       }}
     >
       {children}
