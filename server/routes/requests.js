@@ -12,6 +12,9 @@ router.get("/user/:userId", auth, requestController.getUserRequests);
 // Get current user's requests
 router.get("/my", auth, requestController.getMyRequests);
 
+// Get request stats
+router.get('/stats', auth, requestController.getMyStats);
+
 // Get request by ID
 router.get("/:requestId", auth, requestController.getRequestById);
 

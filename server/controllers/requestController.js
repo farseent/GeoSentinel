@@ -95,3 +95,37 @@ exports.deleteRequest = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getMyStats = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+
+    // Total requests
+    const totalRequests = await Request.countDocuments({ user: userId });
+
+    // Recent requests (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentRequests = await Request.countDocuments({
+      user: userId,
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+
+    // Status breakdown
+    const statusAgg = await Request.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
+    const statusBreakdown = {};
+    statusAgg.forEach(s => { statusBreakdown[s._id] = s.count; });
+    console.log("status breakdown: ",statusBreakdown);
+    
+    res.json({
+      totalRequests,
+      recentRequests,
+      statusBreakdown
+    });
+  } catch (err) {
+    next(err);
+  }
+};

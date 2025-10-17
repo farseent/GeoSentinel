@@ -89,31 +89,36 @@ export const requestsAPI = {
   create: (requestData) => {
     return api.post('/requests', requestData);
   },
+  
+  // Get all user's requests (for current user)
+  getMyRequests: () => {
+    return api.get('/requests/my');
+  },
+  
+  // Delete request
+  delete: (requestId) => {
+    return api.delete(`/requests/${requestId}`);
+  },
 
   // Get user's requests
   getUserRequests: (userId) => {
     return api.get(`/requests/user/${userId}`);
   },
 
-  // Get all user's requests (for current user)
-  getMyRequests: () => {
-    return api.get('/requests/my');
-  },
+  getRequestStats: () => {
+    return api.get('/requests/stats');
+  }
 
   // Get specific request
-  getById: (requestId) => {
-    return api.get(`/requests/${requestId}`);
-  },
+  // getById: (requestId) => {
+  //   return api.get(`/requests/${requestId}`);
+  // },
 
   // Update request status (admin only)
-  updateStatus: (requestId, status) => {
-    return api.patch(`/requests/${requestId}/status`, { status });
-  },
+  // updateStatus: (requestId, status) => {
+  //   return api.patch(`/requests/${requestId}/status`, { status });
+  // },
 
-  // Delete request
-  delete: (requestId) => {
-    return api.delete(`/requests/${requestId}`);
-  },
 };
 
 // User profile API endpoints

@@ -11,7 +11,7 @@ import ErrorMessage from '../components/common/ErrorMessage';
 const Home = () => {
   const { isAuthenticated } = useAuth();
   const { aoi, setAoi, coordinates, setCoordinates } = useMap();
-  const { submitRequest, isSubmitting, error } = useRequests();
+  const { createRequest, isSubmitting, error } = useRequests();
 
   const [dateRange, setDateRange] = useState({
     startDate: '',
@@ -53,7 +53,7 @@ const handleSubmitRequest = async () => {
     dateTo: dateRange.endDate,
   };
 
-  const result = await submitRequest(requestData);
+  const result = await createRequest(requestData);
 
   if (result.success) {
     setSuccessMessage(result.message); // backend message
