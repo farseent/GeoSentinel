@@ -72,14 +72,14 @@ export const authAPI = {
     return api.post('/auth/refresh');
   },
 
-  // Request password reset
-  requestPasswordReset: (email) => {
-    return api.post('/auth/forgot-password', { email });
+  // ✅ Forgot password - send reset email
+  forgotPassword: (email) =>{ 
+    return api.post('/auth/forgot-password', { email })
   },
 
-  // Reset password
-  resetPassword: (token, newPassword) => {
-    return api.post('/auth/reset-password', { token, newPassword });
+   // ✅ Reset password - update with new password
+  resetPassword: (token, password) =>{ 
+    return api.post(`/auth/reset-password/${token}`, { password })
   },
 };
 

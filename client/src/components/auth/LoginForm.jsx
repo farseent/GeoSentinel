@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { validateEmail } from '../../utils/validation';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/ErrorMessage';
+import { Link } from 'react-router-dom';
 
 const LoginForm = ({ onSuccess }) => {
   const { login, loading, error, clearError } = useAuth();
@@ -113,6 +114,16 @@ const LoginForm = ({ onSuccess }) => {
             {formErrors.password && (
               <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
             )}
+
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
           </div>
 
           <button

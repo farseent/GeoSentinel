@@ -159,3 +159,64 @@ exports.checkAuth = (req, res) => {
     user: { id: _id, name, email, isAdmin }
   });
 };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ success: false, message: "User not found" });
+
+    // Generate reset token valid for 1 hour
+    const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${encodeURIComponent(resetToken)}`;
+    const html = `
+      <h2>Password Reset Request - GeoSentinel</h2>
+      <p>Hello ${user.name},</p>
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+      <p>This link expires in 1 hour.</p>
+    `;
+
+    await sendEmail(user.email, "Reset Your GeoSentinel Password", html);
+
+    res.status(200).json({ success: true, message: "Password reset link sent to your email." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error sending password reset link" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const decoded = jwt.verify(decodeURIComponent(token), JWT_SECRET);
+
+    const user = await User.findOne({
+      email: decoded.email,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid or expired token" });
+    }
+
+    user.password = password; // Assuming your schema hashes it via pre-save middleware
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password reset successful. You can now log in." });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ success: false, message: "Invalid or expired reset link" });
+  }
+};
