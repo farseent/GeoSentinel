@@ -1,3 +1,4 @@
+// MapContainer.jsx (updated)
 import { MapContainer as LeafletMap, TileLayer, FeatureGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
@@ -131,14 +132,6 @@ const MapContainer = () => {
           opacity={1.0}
         />
 
-        {/* OSM overlay for labels/roads */}
-        {/* <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="© OpenStreetMap contributors"
-          opacity={0.1}
-        /> */}
-        
-
         {isAuthenticated && (
           <FeatureGroup ref={featureGroupRef}>
             <EditControl
@@ -170,7 +163,7 @@ const MapContainer = () => {
         )}
       </LeafletMap>
 
-      {/* AOI Selected Overlay */}
+      {/* AOI Selected Overlay - Moved to avoid overlap with search */}
       {isAuthenticated && aoi && (
         <div className="absolute bottom-4 left-4 bg-white bg-opacity-95 border border-green-300 p-3 rounded-lg shadow-lg z-10">
           <div className="flex items-center space-x-2 mb-1">
@@ -179,6 +172,18 @@ const MapContainer = () => {
           </div>
           <div className="text-xs text-green-700">
             Area: {aoi.area?.toFixed(2)} km² • Use the delete tool (🗑️) to remove or edit tool (✏️) to modify.
+          </div>
+        </div>
+      )}
+
+      {/* Status Overlay - Moved to avoid overlap with search */}
+      {isAuthenticated && (
+        <div className="absolute top-4 left-4 bg-white bg-opacity-95 border border-gray-200 px-3 py-2 rounded-lg shadow-lg z-10">
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${aoi ? 'bg-green-500' : 'bg-blue-500 animate-pulse'}`}></div>
+            <span className="text-sm font-medium text-gray-800">
+              {aoi ? 'AOI Selected' : 'Ready to Draw AOI'}
+            </span>
           </div>
         </div>
       )}
