@@ -1,0 +1,135 @@
+/* leaflet-draw-custom.css */
+.leaflet-draw-toolbar {
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border: transparent !important;
+}
+
+.leaflet-draw-toolbar a {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-bottom: none !important;
+  width: 30px !important;
+  height: 30px !important;
+  background-size: 20px 20px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.leaflet-draw-toolbar a:first-child {
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+}
+
+.leaflet-draw-toolbar a:last-child {
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+/* Draw Rectangle Icon */
+.leaflet-draw-draw-rectangle {
+  background-image: url('./../../public/icons/rectangle-icon.svg') !important;
+}
+
+.leaflet-draw-draw-rectangle:hover {
+  background-color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Edit Icon */
+.leaflet-draw-edit-edit {
+  background-image: url('./../../public/icons/edit-icon.svg') !important;
+}
+
+.leaflet-draw-edit-edit:hover {
+  background-color: #dcfce7 !important;
+  border-color: #10b943 !important;
+}
+
+/* Delete Icon */
+.leaflet-draw-edit-remove {
+  background-image: url('./../../public/icons/delete-icon.svg') !important;
+}
+
+.leaflet-draw-edit-remove:hover {
+  background-color: #fee2e2 !important;
+  border-color: #ef4444 !important;
+}
+
+/* Active States */
+.leaflet-draw-draw-rectangle.leaflet-draw-toolbar-button-enabled {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+}
+
+.leaflet-draw-edit-edit.leaflet-draw-toolbar-button-enabled {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'/%3E%3C/svg%3E") !important;
+}
+
+.leaflet-draw-edit-remove.leaflet-draw-toolbar-button-enabled {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/%3E%3C/svg%3E") !important;
+}
+/*----------------------------*/
+/* Save / Cancel Buttons (Edit Toolbar Sub-actions) */
+.leaflet-draw-actions {
+  background: white !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #9ea8bd !important;
+  overflow: hidden !important;
+  height: 30px !important;
+  /* margin-top: 6px !important; */
+
+}
+
+.leaflet-draw-actions li {
+  border-bottom: 1px solid #f3f4f6 !important;
+}
+
+.leaflet-draw-actions li:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-draw-actions a {
+  display: block !important;
+  /* padding: 8px 14px !important; */
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  text-align: center !important;
+  background: white !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.leaflet-draw-actions a:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Specific Save/Cancel Themes */
+.leaflet-draw-actions a.leaflet-draw-action-save {
+  color: #10b981 !important;
+  font-weight: 600 !important;
+}
+
+.leaflet-draw-actions a.leaflet-draw-action-save:hover {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.leaflet-draw-actions a.leaflet-draw-action-cancel {
+  color: #ef4444 !important;
+  font-weight: 600 !important;
+}
+
+.leaflet-draw-actions a.leaflet-draw-action-cancel:hover {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}

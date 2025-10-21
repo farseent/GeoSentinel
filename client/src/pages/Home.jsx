@@ -1,3 +1,4 @@
+//Home.jsx
 import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import useMap from '../hooks/useMap';
@@ -293,7 +294,7 @@ const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || i
                 <MapContainer />
                 
                 {/* Status Overlay */}
-                {isAuthenticated && (
+                {/* {isAuthenticated && (
                   <div className="absolute top-4 left-4 bg-white bg-opacity-95 border border-gray-200 px-3 py-2 rounded-lg shadow-lg z-10">
                     <div className="flex items-center space-x-2">
                       <div className={`w-3 h-3 rounded-full ${aoi ? 'bg-green-500' : 'bg-blue-500 animate-pulse'}`}></div>
@@ -302,7 +303,7 @@ const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || i
                       </span>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>
