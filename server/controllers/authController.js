@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 
 const generateToken = user => {
   return jwt.sign(
-    { id: user._id, email: user.email, isAdmin: user.isAdmin },
+    { id: user._id, email: user.email, role: user.role },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
   );
@@ -135,7 +135,7 @@ exports.login = async (req, res, next) => {
 
     const token = generateToken(user);
     res.cookie('token', token, COOKIE_OPTIONS);
-    res.json({ message: 'Logged in Succesfully!', user: { id: user._id, name: user.name, email }, "success": true });
+    res.json({ message: 'Logged in Succesfully!', user: { id: user._id, name: user.name, email, role: user.role }, "success": true });
   } catch (err) {
     next(err);
   }
@@ -153,10 +153,10 @@ exports.checkAuth = (req, res) => {
   if (!req.user) {
     return res.json({ success: false, message: "Not authenticated", user: null });
   }
-  const { _id, name, email, isAdmin } = req.user;
+  const { _id, name, email, role } = req.user;
   res.json({
     success: true,
-    user: { id: _id, name, email, isAdmin }
+    user: { id: _id, name, email, role }
   });
 };
 
