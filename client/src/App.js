@@ -3,8 +3,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
 import { RequestProvider } from "./context/RequestContext";
 
-import Navbar from "./components/common/Navbar";
-import Footer from "./components/common/Footer";
+// import Navbar from "./components/common/Navbar";
+// import Footer from "./components/common/Footer";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -16,6 +16,7 @@ import ResetPassword from "./pages/ResetPassword";
 
 
 import Profile from "./pages/Profile";
+import UserLayout from "./components/Layout/UserLayout";
 
 
 function App() {
@@ -23,23 +24,18 @@ function App() {
     <AuthProvider>
       <MapProvider>
         <RequestProvider>
-          <div className="flex flex-col min-h-screen bg-gray-50">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/verify/:token" element={<VerifyEmail />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password/:token" element={<ResetPassword />} />
-                <Route path="*" element={<NotFound />} />
-                {/* Add other routes here */}
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <Routes>
+            <Route element={<UserLayout/>}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/verify/:token" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
         </RequestProvider>
       </MapProvider>
     </AuthProvider>
