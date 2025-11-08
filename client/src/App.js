@@ -19,6 +19,7 @@ import UserRoutes from "./routes/UserRoutes";
 
 import UserProtected from "./components/protected/UserProtected";
 import AdminProtected from "./components/protected/AdminProtected";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
               <Route path="/verify/:token" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="*" element={<NotFound />} />
               <Route element={<UserProtected />}>
                 {UserRoutes.map(({path, element}, idx) =>(
