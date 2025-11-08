@@ -3,8 +3,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
 import { RequestProvider } from "./context/RequestContext";
 
-// import Navbar from "./components/common/Navbar";
-// import Footer from "./components/common/Footer";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -14,9 +12,13 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
-
-import Profile from "./pages/Profile";
 import UserLayout from "./components/Layout/UserLayout";
+
+import AdminRoutes from "./routes/AdminRoutes";
+import UserRoutes from "./routes/UserRoutes";
+
+import UserProtected from "./components/protected/UserProtected";
+import AdminProtected from "./components/protected/AdminProtected";
 
 
 function App() {
@@ -29,11 +31,21 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/profile" element={<Profile />} />
               <Route path="/verify/:token" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="*" element={<NotFound />} />
+              <Route element={<UserProtected />}>
+                {UserRoutes.map(({path, element}, idx) =>(
+                  <Route key={idx} path={path} element={element} /> 
+                ))}
+              </Route>
+            </Route>
+            
+            <Route element = {<AdminProtected />}>
+              {AdminRoutes.map(({path, element}, idx) =>(
+                <Route key={idx} path={path} element={element} /> 
+              ))}
             </Route>
           </Routes>
         </RequestProvider>

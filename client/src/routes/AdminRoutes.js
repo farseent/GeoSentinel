@@ -1,7 +1,7 @@
-import  AdminDashboard  from "../pages/Admin/AdminDashboard";
-import  UserManagment  from "../pages/Admin/UserManagment";
-import  RequestManagment  from "../pages/Admin/RequestManagment";
-import  AdminSettings  from "../pages/Admin/AdminSettings";
+import { AdminDashboard } from "../pages/Admin/AdminDashboard";
+import { UserManagment } from "../pages/Admin/UserManagment";
+import { RequestManagment } from "../pages/Admin/RequestManagment";
+import { AdminSettings } from "../pages/Admin/AdminSettings";
 
 const AdminRoutes = [
     {path : '/admin/dashboard', element : <AdminDashboard/> },
