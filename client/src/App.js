@@ -11,15 +11,19 @@ import NotFound from "./pages/NotFound";
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+import Profile from "./pages/Profile";
+
+import  AdminDashboard  from "./pages/Admin/AdminDashboard";
+import  UserManagment  from "./pages/Admin/UserManagment";
+import  RequestManagment  from "./pages/Admin/RequestManagment";
+import  AdminSettings  from "./pages/Admin/AdminSettings";
 
 import UserLayout from "./components/Layout/UserLayout";
-
-import AdminRoutes from "./routes/AdminRoutes";
-import UserRoutes from "./routes/UserRoutes";
+import AdminLayout from "./components/Layout/AdminLayout";
 
 import UserProtected from "./components/protected/UserProtected";
 import AdminProtected from "./components/protected/AdminProtected";
-import UnauthorizedPage from "./pages/UnauthorizedPage";
 
 
 function App() {
@@ -28,7 +32,7 @@ function App() {
       <MapProvider>
         <RequestProvider>
           <Routes>
-            <Route element={<UserLayout/>}>
+            <Route element={<UserLayout/>} >
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -37,17 +41,19 @@ function App() {
               <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
               <Route path="*" element={<NotFound />} />
+
               <Route element={<UserProtected />}>
-                {UserRoutes.map(({path, element}, idx) =>(
-                  <Route key={idx} path={path} element={element} /> 
-                ))}
+                <Route path="/profile" element={<Profile />} />
               </Route>
+
             </Route>
-            
-            <Route element = {<AdminProtected />}>
-              {AdminRoutes.map(({path, element}, idx) =>(
-                <Route key={idx} path={path} element={element} /> 
-              ))}
+            <Route element={<AdminProtected />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="users" element={<UserManagment />} />
+                  <Route path="requests" element={<RequestManagment />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
             </Route>
           </Routes>
         </RequestProvider>

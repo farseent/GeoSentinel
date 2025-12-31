@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const RequestManagment = () => {
+const RequestManagment = () => {
   return (
     <div>RequestManagment</div>
   )
 }
+
+export default RequestManagment;

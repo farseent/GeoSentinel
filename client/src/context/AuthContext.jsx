@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.data.success) {
         setUser(response.data.user);
-        // console.log("Login success", response.data.user);
+        console.log("Login success", response.data.user);
         // console.log("Login message from backend", response.data.message);
         return { success: true, message : response.data.message };
       }else {

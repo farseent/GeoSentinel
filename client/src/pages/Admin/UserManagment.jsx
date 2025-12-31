@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const UserManagment = () => {
+const UserManagment = () => {
   return (
     <div>UserManagment</div>
   )
 }
+
+export default UserManagment;
