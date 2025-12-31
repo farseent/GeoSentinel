@@ -1,18 +1,35 @@
 import React from 'react';
-
+import { useNavigate } from 'react-router-dom';
 
 const UnauthorizedPage = () => {
+  const navigate = useNavigate();
+
   return (
-    <main class="grid min-h-full place-items-center bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
-  <div class="text-center">
-    <p class="text-base font-semibold text-indigo-400">404</p>
-    <h1 class="mt-4 text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl">Page not found</h1>
-    <p class="mt-6 text-lg font-medium text-pretty text-gray-400 sm:text-xl/8">Sorry, we couldn’t find the page you’re looking for.</p>
-    <div class="mt-10 flex items-center justify-center gap-x-6">
-      <a href="/" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Go back home</a>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+        <div className="text-6xl mb-4">🚫</div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Access Denied
+        </h1>
+        <p className="text-gray-600 mb-6">
+          You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+        </p>
+        <div className="space-x-4">
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Go Home
+          </button>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</main>
   );
 };
 
