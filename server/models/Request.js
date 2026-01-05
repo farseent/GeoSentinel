@@ -8,6 +8,15 @@ const requestSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+     processedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
+
+  processedAt: {
+    type: Date
+  },
     coordinates: {
       // Rectangle AOI: { north, south, east, west }
       type: {
@@ -34,5 +43,8 @@ const requestSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+requestSchema.index({ user: 1, createdAt: -1 });
+requestSchema.index({ status: 1 });
 
 module.exports = mongoose.model("Request", requestSchema);

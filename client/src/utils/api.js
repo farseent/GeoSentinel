@@ -146,25 +146,22 @@ export const userAPI = {
 
 // Admin API endpoints (if needed)
 export const adminAPI = {
-  // Get all users
-  getAllUsers: () => {
-    return api.get('/admin/users');
-  },
+  // Dashboard
+  getDashboardStats: () => api.get('/admin/dashboard/stats'),
 
-  // Get all requests
-  getAllRequests: () => {
-    return api.get('/admin/requests');
-  },
+  // User Management
+  getAllUsers: (params) => api.get('/admin/users', { params }),
+  toggleUserBlock: (userId) => api.patch(`/admin/users/${userId}/toggle-block`),
+  deleteUser: (userId) => api.delete(`/admin/users/${userId}`),
 
-  // Update user status
-  updateUserStatus: (userId, status) => {
-    return api.patch(`/admin/users/${userId}/status`, { status });
-  },
+  // Request Management
+  getAllRequests: (params) => api.get('/admin/requests', { params }),
+  updateRequestStatus: (requestId, data) => api.patch(`/admin/requests/${requestId}/status`, data),
+  deleteRequest: (requestId) => api.delete(`/admin/requests/${requestId}`),
 
-  // Delete user
-  deleteUser: (userId) => {
-    return api.delete(`/admin/users/${userId}`);
-  },
+  // Settings
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (settings) => api.put('/admin/settings', settings),
 };
 
 // Map/GIS API endpoints
