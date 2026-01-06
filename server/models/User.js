@@ -13,7 +13,11 @@ const userSchema = new mongoose.Schema({
   // verificationTokenExpires: { type: Date },
   // resetPasswordToken: { type: String },
   // resetPasswordExpires: { type: Date },
-});
+},
+{
+  timestamps: true
+}
+);
 
 // Hash password before save
 userSchema.pre('save', async function (next) {

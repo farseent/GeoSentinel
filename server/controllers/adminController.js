@@ -8,10 +8,10 @@ exports.getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({ role: 'user' });
     const totalRequests = await Request.countDocuments();
-    const pendingRequests = await Request.countDocuments({ status: 'pending' });
-    const processingRequests = await Request.countDocuments({ status: 'processing' });
-    const completedRequests = await Request.countDocuments({ status: 'completed' });
-    const failedRequests = await Request.countDocuments({ status: 'failed' });
+    const pendingRequests = await Request.countDocuments({ status: 'Pending' });
+    const processingRequests = await Request.countDocuments({ status: 'Processing' });
+    const completedRequests = await Request.countDocuments({ status: 'Completed' });
+    const failedRequests = await Request.countDocuments({ status: 'Failed' });
     const blockedUsers = await User.countDocuments({ isBlocked: true });
 
     // Recent requests
