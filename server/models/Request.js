@@ -12,11 +12,15 @@ const requestSchema = new mongoose.Schema(
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     default: null
-  },
-
-  processedAt: {
-    type: Date
-  },
+    },
+    processedAt: {
+      type: Date,
+      default: null
+    },
+    adminNotes: {
+      type: String,
+      default: ''
+    },
     coordinates: {
       // Rectangle AOI: { north, south, east, west }
       type: {
@@ -40,6 +44,7 @@ const requestSchema = new mongoose.Schema(
       enum: Object.values(REQUEST_STATUS),
       default: REQUEST_STATUS.PENDING,
     },
+    completedAt: Date
   },
   { timestamps: true }
 );

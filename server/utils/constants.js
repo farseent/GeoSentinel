@@ -1,7 +1,8 @@
 module.exports = {
   REQUEST_STATUS: {
-    PENDING: 'Pending',
-    PROCESSING: 'Processing',
-    COMPLETED: 'Completed'
+    PENDING: 'pending',
+    PROCESSING: 'processing',
+    COMPLETED: 'completed',
+    FAILED: 'failed'
   }
 };

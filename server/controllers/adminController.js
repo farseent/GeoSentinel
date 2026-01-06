@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Request = require('../models/Request');
 const Settings = require('../models/Settings');
+const { REQUEST_STATUS } = require("../utils/constants");
 
 // Get Dashboard Statistics
 exports.getDashboardStats = async (req, res) => {
@@ -270,9 +271,12 @@ exports.updateRequestStatus = async (req, res) => {
     request.status = status;
     if (adminNotes) request.adminNotes = adminNotes;
     request.processedBy = req.user._id;
+    request.processedAt = new Date();
 
-    if (status === 'completed') {
+    if (status === REQUEST_STATUS.COMPLETED) {
       request.completedAt = new Date();
+    } else {
+      request.completedAt = null;
     }
 
     await request.save();
