@@ -3,12 +3,11 @@ import AdminSidebar from "./AdminSidebar";
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-
-      <main className="flex-grow p-6">
+      <div className="flex-1 overflow-y-auto">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 };
