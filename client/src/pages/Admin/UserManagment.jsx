@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useSearchParams } from 'react-router-dom';
+
 
 const UserManagment = () => {
-   const [users, setUsers] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams(); 
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -112,6 +115,7 @@ const UserManagment = () => {
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setPage(1);
+              setSearchParams({ status: e.target.value });
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
