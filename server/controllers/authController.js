@@ -122,6 +122,12 @@ exports.login = async (req, res, next) => {
     if (!user)
       return res.status(401).json({ message: 'User not found' });
     
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been blocked. Please contact admin.'
+      });
+    }
     // 🔑 NEW: Check if the user's email is verified
     // if (!user.isVerified) {
     //   return res.status(401).json({ 
