@@ -348,20 +348,22 @@ exports.updateSettings = async (req, res) => {
   try {
     const { maintenanceMode } = req.body;
 
-    let settings = await Settings.findOne();
-    
-    if (!settings) {
-      settings = await Settings.create({ maintenanceMode });
-    } else {
-      settings.maintenanceMode = maintenanceMode;
-      await settings.save();
-    }
+    const settings = await Settings.findOneAndUpdate(
+      {},                       // match the single settings doc
+      { maintenanceMode },      // update only maintenanceMode
+      {
+        new: true,              // return updated document
+        upsert: true,           // create if none exists
+        runValidators: true     // respect schema validation
+      }
+    );
 
     res.status(200).json({
       success: true,
       message: 'Settings updated successfully',
       data: settings
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

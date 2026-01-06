@@ -11,14 +11,14 @@ app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.use('/api/auth', require('./routes/auth'));
 // Maintenance mode check (before routes)
+app.use('/api/admin', require('./routes/admin'));
 app.use(checkMaintenance);
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/requests', require('./routes/requests'));
-app.use('/api/admin', require('./routes/admin'));
 
 // Error handling
 app.use(errorHandler);

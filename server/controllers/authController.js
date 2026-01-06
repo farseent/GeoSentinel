@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Settings = require('../models/Settings');
 const jwt = require('jsonwebtoken');
 // const sendEmail = require('../utils/sendEmail'); 
 const { JWT_SECRET, JWT_EXPIRES_IN, COOKIE_OPTIONS } = require('../config/jwt');
@@ -135,6 +136,20 @@ exports.login = async (req, res, next) => {
     //     message: 'Your email is not verified. Please check your inbox for the verification link.' 
     //   });
     // }
+
+    // 🔧 MAINTENANCE MODE CHECK
+    const settings = await Settings.findOne();
+    if (
+      settings?.maintenanceMode.enabled &&
+      user.role !== 'admin' &&
+      !settings.maintenanceMode.allowedEmails.includes(user.email)
+    ) {
+      return res.status(503).json({
+        success: false,
+        message: settings.maintenanceMode.message,
+        maintenanceMode: true
+      });
+    }
 
     if(!(await user.matchPassword(password)))
       return res.status(401).json({message:'Invalid credentials'})
