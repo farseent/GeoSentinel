@@ -1,11 +1,14 @@
+// Profile.jsx
 import React, { useState, useEffect } from 'react';
-import  useAuth  from '../hooks/useAuth';
-import  useRequests  from '../hooks/useRequests';
+import { motion, AnimatePresence } from 'framer-motion';
+import useAuth from '../hooks/useAuth';
+import useRequests from '../hooks/useRequests';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import RequestsList from '../components/profile/RequestsList';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import SuccessMessage from '../components/common/SuccessMessage';
+import {  ClipboardDocumentListIcon,  Cog6ToothIcon, ChartBarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -14,15 +17,14 @@ const Profile = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
-    // Fetch user requests and stats on component mount
     fetchMyRequests();
-    getRequestStats()
-  }, [getRequestStats]);
+    getRequestStats();
+  }, [getRequestStats, fetchMyRequests]);
 
   const handleProfileUpdate = async (profileData) => {
     try {
       await updateProfile(profileData);
-      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setMessage({ type: 'success', text: '✨ Profile updated successfully!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (error) {
       setMessage({ type: 'error', text: error.message || 'Failed to update profile' });
@@ -30,190 +32,320 @@ const Profile = () => {
     }
   };
 
-  const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'PROCESSING':
-        return 'bg-blue-100 text-blue-800';
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800';
-      case 'FAILED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: ChartBarIcon },
+    { id: 'requests', label: 'Requests', icon: ClipboardDocumentListIcon },
+    { id: 'settings', label: 'Settings', icon: Cog6ToothIcon },
+  ];
+
+  const statsCards = [
+    { 
+      label: 'Total Requests', 
+      value: stats?.totalRequests || 0, 
+      color: 'from-blue-500 to-blue-600',
+      icon: ClipboardDocumentListIcon,
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-600'
+    },
+    { 
+      label: 'Recent Requests', 
+      value: stats?.recentRequests || 0, 
+      subtext: 'Last 30 days',
+      color: 'from-green-500 to-green-600',
+      icon: ArrowPathIcon,
+      bgColor: 'bg-green-50',
+      textColor: 'text-green-600'
+    },
+    { 
+      label: 'Completed', 
+      value: stats?.statusBreakdown?.COMPLETED || 0, 
+      color: 'from-purple-500 to-purple-600',
+      icon: ChartBarIcon,
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-600'
+    },
+  ];
 
   if (loading && !requests.length) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <LoadingSpinner size="large" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Messages */}
-        {message.text && (
-          <div className="mb-6">
-            {message.type === 'success' ? (
-              <SuccessMessage message={message.text} />
-            ) : (
-              <ErrorMessage message={message.text} />
-            )}
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Animated Messages */}
+        <AnimatePresence>
+          {message.text && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-6"
+            >
+              {message.type === 'success' ? (
+                <SuccessMessage message={message.text} />
+              ) : (
+                <ErrorMessage message={message.text} />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-lg">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{user?.name}</h3>
-                    <p className="text-sm text-gray-500">{user?.email}</p>
+          {/* Sidebar - Glassmorphism Effect */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="lg:col-span-1"
+          >
+            <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden sticky top-8">
+              {/* User Profile Summary */}
+              <div className="p-6 bg-gradient-to-r from-blue-600 to-purple-600">
+                <div className="flex items-center space-x-4">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="relative"
+                  >
+                    <div className="h-16 w-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center border-2 border-white">
+                      <span className="text-white font-bold text-2xl">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></div>
+                  </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-white truncate">{user?.name}</h3>
+                    <p className="text-sm text-blue-100 truncate">{user?.email}</p>
                   </div>
                 </div>
               </div>
               
-              {/* Navigation */}
-              <nav className="border-t">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className={`w-full text-left px-6 py-3 text-sm font-medium ${
-                    activeTab === 'overview'
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => setActiveTab('requests')}
-                  className={`w-full text-left px-6 py-3 text-sm font-medium ${
-                    activeTab === 'requests'
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  My Requests
-                </button>
-                <button
-                  onClick={() => setActiveTab('settings')}
-                  className={`w-full text-left px-6 py-3 text-sm font-medium ${
-                    activeTab === 'settings'
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Settings
-                </button>
+              {/* Navigation Tabs */}
+              <nav className="p-4">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <motion.button
+                      key={tab.id}
+                      whileHover={{ x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl mb-1 transition-all ${
+                        activeTab === tab.id
+                          ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 shadow-sm'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Icon className={`h-5 w-5 ${
+                        activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'
+                      }`} />
+                      <span className={`font-medium ${
+                        activeTab === tab.id ? 'text-blue-700' : 'text-gray-600'
+                      }`}>
+                        {tab.label}
+                      </span>
+                      {tab.id === 'requests' && requests.length > 0 && (
+                        <span className={`ml-auto px-2 py-1 text-xs rounded-full ${
+                          activeTab === tab.id
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {requests.length}
+                        </span>
+                      )}
+                    </motion.button>
+                  );
+                })}
               </nav>
+
+              {/* Quick Stats */}
+              <div className="p-4 border-t border-gray-100">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+                  Quick Stats
+                </p>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Member since</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        year: 'numeric' 
+                      }) : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Account type</span>
+                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${
+                      user?.isAdmin 
+                        ? 'bg-purple-100 text-purple-700' 
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {user?.isAdmin ? 'Admin' : 'Standard'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            {activeTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {loadingStats ? (
-                    <div className="col-span-3 flex justify-center">
-                      <LoadingSpinner />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Requests</h3>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {stats?.totalRequests || 0}
-                        </p>
-                      </div>
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Recent Requests</h3>
-                        <p className="text-3xl font-bold text-green-600">
-                          {stats?.recentRequests || 0}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">Last 30 days</p>
-                      </div>
-                      <div className="bg-white rounded-lg shadow p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Completed</h3>
-                        <p className="text-3xl font-bold text-purple-600">
-                          {stats?.statusBreakdown?.COMPLETED || 0}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Recent Requests */}
-                <div className="bg-white rounded-lg shadow">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Recent Requests</h3>
-                  </div>
-                  <div className="p-6">
-                    {requests.length > 0 ? (
-                      <div className="space-y-4">
-                        {requests.slice(0, 5).map((request) => (
-                          <div key={request._id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">
-                                AOI Request - {new Date(request.createdAt).toLocaleDateString()}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {new Date(request.dateFrom).toLocaleDateString()} - {new Date(request.dateTo).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(request.status)}`}>
-                              {request.status}
-                            </span>
-                          </div>
-                        ))}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-3"
+          >
+            <AnimatePresence mode="wait">
+              {activeTab === 'overview' && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-6"
+                >
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {loadingStats ? (
+                      <div className="col-span-3 flex justify-center py-12">
+                        <LoadingSpinner />
                       </div>
                     ) : (
-                      <p className="text-gray-500 text-center py-8">No requests found</p>
+                      statsCards.map((stat, index) => {
+                        const Icon = stat.icon;
+                        return (
+                          <motion.div
+                            key={stat.label}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            whileHover={{ y: -4 }}
+                            className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div className={`p-3 rounded-xl ${stat.bgColor}`}>
+                                <Icon className={`h-6 w-6 ${stat.textColor}`} />
+                              </div>
+                              <span className="text-3xl font-bold text-gray-900">{stat.value}</span>
+                            </div>
+                            <h3 className="text-sm font-medium text-gray-600">{stat.label}</h3>
+                            {stat.subtext && (
+                              <p className="text-xs text-gray-400 mt-1">{stat.subtext}</p>
+                            )}
+                          </motion.div>
+                        );
+                      })
                     )}
                   </div>
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'requests' && (
-              <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">All Requests</h3>
-                </div>
-                <RequestsList 
-                  requests={requests}
-                  loading={loading}
-                  error={error}
-                  onRefresh={fetchMyRequests}
-                />
-              </div>
-            )}
+                  {/* Recent Requests */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden"
+                  >
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                      <h3 className="text-lg font-semibold text-gray-900">Recent Requests</h3>
+                      <button
+                        onClick={() => setActiveTab('requests')}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        View all →
+                      </button>
+                    </div>
+                    <div className="p-6">
+                      {requests.length > 0 ? (
+                        <div className="space-y-4">
+                          {requests.slice(0, 3).map((request, index) => (
+                            <motion.div
+                              key={request._id}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="group p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    AOI Request #{request._id.slice(-6).toUpperCase()}
+                                  </p>
+                                  <p className="text-sm text-gray-500 mt-1">
+                                    {new Date(request.createdAt).toLocaleDateString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      year: 'numeric'
+                                    })}
+                                  </p>
+                                </div>
+                                <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                                  request.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                                  request.status === 'PROCESSING' ? 'bg-blue-100 text-blue-700' :
+                                  request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-red-100 text-red-700'
+                                }`}>
+                                  {request.status}
+                                </span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <div className="h-20 w-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <ClipboardDocumentListIcon className="h-10 w-10 text-gray-400" />
+                          </div>
+                          <p className="text-gray-500">No requests yet</p>
+                          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Create your first request
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
 
-            {activeTab === 'settings' && (
-              <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">Profile Settings</h3>
-                </div>
-                <ProfileHeader 
-                  user={user}
-                  onUpdateProfile={handleProfileUpdate}
-                />
-              </div>
-            )}
-          </div>
+              {activeTab === 'requests' && (
+                <motion.div
+                  key="requests"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <RequestsList 
+                    requests={requests}
+                    loading={loading}
+                    error={error}
+                    onRefresh={fetchMyRequests}
+                  />
+                </motion.div>
+              )}
+
+              {activeTab === 'settings' && (
+                <motion.div
+                  key="settings"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden"
+                >
+                  <ProfileHeader 
+                    user={user}
+                    onUpdateProfile={handleProfileUpdate}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </div>
