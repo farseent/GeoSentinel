@@ -136,52 +136,66 @@ const LocationButton = () => {
 
     
     const _onCreated = (e) => {
-    const layer = e.layer;
+      const layer = e.layer;
 
-    // 🔹 Remove any existing layers before adding a new one
-    if (featureGroupRef.current) {
-      featureGroupRef.current.clearLayers();
-    }
+      if (featureGroupRef.current) {
+        featureGroupRef.current.clearLayers();
+      }
 
-    featureGroupRef.current.addLayer(layer); // Add only the current layer
+      featureGroupRef.current.addLayer(layer);
 
-    const bounds = layer.getBounds();
-    const sw = bounds.getSouthWest();
-    const ne = bounds.getNorthEast();
-    const nw = [ne.lat, sw.lng];
-    const se = [sw.lat, ne.lng];
+      const bounds = layer.getBounds();
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      const nw = [ne.lat, sw.lng];
+      const se = [sw.lat, ne.lng];
 
-    const coordinates = [
-      [sw.lng, sw.lat],
-      [se[1], se[0]],
-      [ne.lng, ne.lat],
-      [nw[1], nw[0]],
-      [sw.lng, sw.lat],
-    ];
+      const coordinates = [
+        [sw.lng, sw.lat],
+        [se[1], se[0]],
+        [ne.lng, ne.lat],
+        [nw[1], nw[0]],
+        [sw.lng, sw.lat],
+      ];
 
-    const earthRadius = 6371;
-    const latDiff = Math.abs(ne.lat - sw.lat);
-    const lngDiff = Math.abs(ne.lng - sw.lng);
-    const meanLat = (ne.lat + sw.lat) / 2;
-    const area =
-      latDiff * (Math.PI / 180) * earthRadius *
-      lngDiff * (Math.PI / 180) * earthRadius *
-      Math.cos(meanLat * Math.PI / 180);
+      const earthRadius = 6371;
+      const latDiff = Math.abs(ne.lat - sw.lat);
+      const lngDiff = Math.abs(ne.lng - sw.lng);
+      const meanLat = (ne.lat + sw.lat) / 2;
+      const area =
+        latDiff * (Math.PI / 180) * earthRadius *
+        lngDiff * (Math.PI / 180) * earthRadius *
+        Math.cos(meanLat * Math.PI / 180);
 
-    setAoi({
-      type: "rectangle",
-      coordinates,
-      bounds: {
-        north: ne.lat,
-        south: sw.lat,
-        east: ne.lng,
-        west: sw.lng,
-      },
-      area: Math.abs(area),
-    });
+      const absArea = Math.abs(area);
 
-    setCoordinates(coordinates);
-  };
+      // 🔹 ADD: Validate area size
+      if (absArea < 1) {
+        alert("Selected area is too small (minimum 1 km²). Please draw a larger area.");
+        featureGroupRef.current.clearLayers();
+        return;
+      }
+
+      if (absArea > 500) {
+        alert("Selected area is too large (maximum 500 km²). Please draw a smaller area.");
+        featureGroupRef.current.clearLayers();
+        return;
+      }
+
+      setAoi({
+        type: "rectangle",
+        coordinates,
+        bounds: {
+          north: ne.lat,
+          south: sw.lat,
+          east: ne.lng,
+          west: sw.lng,
+        },
+        area: absArea,
+      });
+
+      setCoordinates(coordinates);
+    };
 
 
   const _onDeleted = () => {
@@ -217,6 +231,8 @@ const LocationButton = () => {
           lngDiff * (Math.PI / 180) * earthRadius *
           Math.cos(meanLat * Math.PI / 180);
 
+        
+          
         setAoi({
           type: "rectangle",
           coordinates,

@@ -39,6 +39,14 @@ const requestSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    imageFrom: { 
+      type: String, 
+      default: null 
+    },  // filename or S3 URL
+    imageTo:   { 
+      type: String, 
+      default: null 
+    },
     status: {
       type: String,
       enum: Object.values(REQUEST_STATUS),

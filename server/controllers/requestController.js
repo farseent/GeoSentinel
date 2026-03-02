@@ -1,13 +1,16 @@
 const Request = require("../models/Request");
+const fetchGEEImage = require('../utils/fetchSatelliteImage');
 
 // Create a new AOI request
 exports.createRequest = async (req, res, next) => {
   try {
     const { coordinates, dateFrom, dateTo } = req.body;
+
     if (!coordinates || !dateFrom || !dateTo) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
+    // Create the DB record first to get an ID
     const request = await Request.create({
       user: req.user._id,
       coordinates,
@@ -16,7 +19,52 @@ exports.createRequest = async (req, res, next) => {
       status: "Pending",
     });
 
-    res.status(201).json({ message: "Request submitted successfully", request });
+    // Fetch satellite images for both dates asynchronously
+    // Don't await here — let it process in background
+    (async () => {
+      try {
+        // Fetch image around dateFrom (±15 day window for cloud-free image)
+        const fromDate = new Date(request.dateFrom);
+        const fromStart = new Date(fromDate);
+        fromStart.setDate(fromStart.getDate() - 15);
+
+        const toDate = new Date(request.dateTo);
+        const toEnd = new Date(toDate);
+        toEnd.setDate(toEnd.getDate() + 15);
+
+        const imageFrom = await fetchGEEImage(
+          request.coordinates,
+          fromStart.toISOString().split('T')[0],  // "YYYY-MM-DD"
+          request.dateFrom.toISOString().split('T')[0],
+          request._id,
+          'from'
+        );
+
+        const imageTo = await fetchGEEImage(
+          request.coordinates,
+          request.dateTo.toISOString().split('T')[0],
+          toEnd.toISOString().split('T')[0],
+          request._id,
+          'to'
+        );
+
+        await Request.findByIdAndUpdate(request._id, {
+          imageFrom,
+          imageTo,
+          status: 'Processing',
+        });
+
+      } catch (err) {
+        console.error('GEE fetch failed:', err.message);
+        await Request.findByIdAndUpdate(request._id, { status: 'Failed' });
+      }
+    })();
+
+    res.status(201).json({ 
+      message: "Request submitted successfully", 
+      request 
+    });
+
   } catch (err) {
     next(err);
   }
