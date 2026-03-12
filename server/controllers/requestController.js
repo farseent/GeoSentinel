@@ -1,12 +1,14 @@
 const Request = require("../models/Request");
-// const fetchGEEImage = require('../utils/fetchSatelliteImage');
+const User = require("../models/User");
 const { fetchAndSaveImagePair } = require("../utils/sentinelHub");
 const { REQUEST_STATUS } = require("../utils/constants");
+const { resultReadyEmail } = require("../utils/emailTemplates");
+const sendEmail = require("../utils/sendEmail");
 const axios = require("axios");
 const path = require("path");
 
 const MODEL_API_URL = process.env.MODEL_API_URL;
-// Create a new AOI request
+
 exports.createRequest = async (req, res, next) => {
   try {
     const { coordinates, dateFrom, dateTo } = req.body;
@@ -37,7 +39,6 @@ exports.createRequest = async (req, res, next) => {
           coordinates, dateFrom, dateTo, request._id
         );
 
-        // Update DB with image paths
         await Request.findByIdAndUpdate(request._id, {
           imageFrom,
           imageTo,
@@ -48,32 +49,50 @@ exports.createRequest = async (req, res, next) => {
         const serverRoot = path.join(__dirname, "..");
         const abs1 = path.join(serverRoot, imageFrom);
         const abs2 = path.join(serverRoot, imageTo);
-        const resultPath = path.join(
-          serverRoot, "uploads", "requests",
-          request._id.toString(), "result.png"
+        const outputDir = path.join(
+          serverRoot, "uploads", "requests", request._id.toString()
         );
 
         // Step 3: Call Flask model API
         const modelResponse = await axios.post(`${MODEL_API_URL}/predict`, {
           image1_path: abs1,
           image2_path: abs2,
-          output_dir: path.join(serverRoot, "uploads", "requests", request._id.toString()),
+          output_dir: outputDir,
         });
 
         const { stats } = modelResponse.data;
-        const requestId  = request._id.toString();
+        const requestId = request._id.toString();
 
         // Step 4: Update request as Completed
         await Request.findByIdAndUpdate(request._id, {
-          resultUrl: `uploads/requests/${requestId}/post_map.png`, // best result
+          resultUrl: `uploads/requests/${requestId}/post_map.png`,
+          stats,
           status: REQUEST_STATUS.COMPLETED,
           completedAt: new Date(),
         });
 
-        console.log(`Request ${request._id} completed. Change: ${modelResponse.data.change_percentage}%`);
+        console.log(`✅ Request ${requestId} completed. Change: ${stats?.change_percentage}%`);
+
+        // Step 5: Send result email (non-blocking — won't fail request if email fails)
+        try {
+          const user = await User.findById(request.user).select('name email');
+          if (user?.email) {
+            const { subject, html } = resultReadyEmail({
+              userName:         user.name || 'User',
+              requestId:        requestId,
+              dateFrom:         dateFrom,
+              dateTo:           dateTo,
+              changePercentage: stats?.change_percentage ?? 'N/A',
+            });
+            await sendEmail(user.email, subject, html);
+            console.log(`📧 Result email sent to ${user.email}`);
+          }
+        } catch (emailErr) {
+          console.error(`⚠️ Email failed (request still completed):`, emailErr.message);
+        }
 
       } catch (err) {
-        console.error(`Request ${request._id} failed:`, err.message);
+        console.error(`❌ Request ${request._id} failed:`, err.message);
         await Request.findByIdAndUpdate(request._id, {
           status: REQUEST_STATUS.FAILED,
         });
