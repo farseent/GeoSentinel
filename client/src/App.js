@@ -13,6 +13,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import Profile from "./pages/Profile";
+import RequestResults from './pages/RequestResults';
 
 import  AdminDashboard  from "./pages/Admin/AdminDashboard";
 import  UserManagment  from "./pages/Admin/UserManagment";
@@ -44,6 +45,7 @@ function App() {
 
               <Route element={<UserProtected />}>
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/results/:requestId" element={<RequestResults />}/>
               </Route>
 
             </Route>

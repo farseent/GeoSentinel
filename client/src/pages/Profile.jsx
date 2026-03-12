@@ -58,7 +58,7 @@ const Profile = () => {
     },
     { 
       label: 'Completed', 
-      value: stats?.statusBreakdown?.COMPLETED || 0, 
+      value: stats?.statusBreakdown?.Completed || 0, 
       color: 'from-purple-500 to-purple-600',
       icon: ChartBarIcon,
       bgColor: 'bg-purple-50',
@@ -162,34 +162,6 @@ const Profile = () => {
                   );
                 })}
               </nav>
-
-              {/* Quick Stats */}
-              <div className="p-4 border-t border-gray-100">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
-                  Quick Stats
-                </p>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Member since</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        year: 'numeric' 
-                      }) : 'N/A'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Account type</span>
-                    <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                      user?.isAdmin 
-                        ? 'bg-purple-100 text-purple-700' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {user?.isAdmin ? 'Admin' : 'Standard'}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
 
@@ -285,9 +257,9 @@ const Profile = () => {
                                   </p>
                                 </div>
                                 <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                  request.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                  request.status === 'PROCESSING' ? 'bg-blue-100 text-blue-700' :
-                                  request.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                  request.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                                  request.status === 'Processing' ? 'bg-blue-100 text-blue-700' :
+                                  request.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
                                   'bg-red-100 text-red-700'
                                 }`}>
                                   {request.status}

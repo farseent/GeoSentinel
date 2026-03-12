@@ -1,5 +1,6 @@
 // RequestsList.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/ErrorMessage';
@@ -10,12 +11,13 @@ const RequestsList = ({ requests, loading, error, onRefresh }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+  const navigate = useNavigate();
 
   const statusColors = {
-    PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', dot: 'bg-yellow-400' },
-    PROCESSING: { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-400' },
-    COMPLETED: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-400' },
-    FAILED: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-400' },
+    Pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', dot: 'bg-yellow-400' },
+    Processing: { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-400' },
+    Completed: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-400' },
+    Failed: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-400' },
   };
 
   const calculateArea = (coordinates) => {
@@ -122,10 +124,10 @@ const RequestsList = ({ requests, loading, error, onRefresh }) => {
                 className="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
               >
                 <option value="all">All Status</option>
-                <option value="PENDING">Pending</option>
-                <option value="PROCESSING">Processing</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="FAILED">Failed</option>
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Completed">Completed</option>
+                <option value="Failed">Failed</option>
               </select>
               <FunnelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
@@ -296,36 +298,19 @@ const RequestsList = ({ requests, loading, error, onRefresh }) => {
                         </div>
 
                         {/* Action buttons */}
-                        <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-3">
+                        {request.status === 'Completed' && (
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm text-sm"
+                            onClick={() => navigate(`/results/${request._id}`)}
+                            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-sm text-sm"
                           >
-                            <MapIcon className="h-4 w-4" />
-                            <span>View on Map</span>
+                            <DocumentArrowDownIcon className="h-4 w-4" />
+                            <span>View Results</span>
                           </motion.button>
-                          
-                          {request.status === 'COMPLETED' && (
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-sm text-sm"
-                            >
-                              <DocumentArrowDownIcon className="h-4 w-4" />
-                              <span>Download Results</span>
-                            </motion.button>
-                          )}
-                          
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all text-sm"
-                          >
-                            <DocumentDuplicateIcon className="h-4 w-4" />
-                            <span>Copy Coordinates</span>
-                          </motion.button>
-                        </div>
+                        )}
+                      </div>
                       </div>
                     </motion.div>
                   )}
