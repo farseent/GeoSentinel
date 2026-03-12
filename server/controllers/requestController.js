@@ -1,5 +1,7 @@
 const Request = require("../models/Request");
-const fetchGEEImage = require('../utils/fetchSatelliteImage');
+// const fetchGEEImage = require('../utils/fetchSatelliteImage');
+const { fetchAndSaveImagePair } = require("../utils/sentinelHub");
+const { REQUEST_STATUS } = require("../utils/constants");
 
 // Create a new AOI request
 exports.createRequest = async (req, res, next) => {
@@ -10,61 +12,41 @@ exports.createRequest = async (req, res, next) => {
       return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Create the DB record first to get an ID
+    const { north, south, east, west } = coordinates;
+    if ([north, south, east, west].some((v) => v === undefined)) {
+      return res.status(400).json({ message: "Invalid AOI coordinates." });
+    }
+
+    // Save request with Pending status
     const request = await Request.create({
       user: req.user._id,
       coordinates,
       dateFrom,
       dateTo,
-      status: "Pending",
+      status: REQUEST_STATUS.PENDING,
     });
 
-    // Fetch satellite images for both dates asynchronously
-    // Don't await here — let it process in background
-    (async () => {
-      try {
-        // Fetch image around dateFrom (±15 day window for cloud-free image)
-        const fromDate = new Date(request.dateFrom);
-        const fromStart = new Date(fromDate);
-        fromStart.setDate(fromStart.getDate() - 15);
-
-        const toDate = new Date(request.dateTo);
-        const toEnd = new Date(toDate);
-        toEnd.setDate(toEnd.getDate() + 15);
-
-        const imageFrom = await fetchGEEImage(
-          request.coordinates,
-          fromStart.toISOString().split('T')[0],  // "YYYY-MM-DD"
-          request.dateFrom.toISOString().split('T')[0],
-          request._id,
-          'from'
-        );
-
-        const imageTo = await fetchGEEImage(
-          request.coordinates,
-          request.dateTo.toISOString().split('T')[0],
-          toEnd.toISOString().split('T')[0],
-          request._id,
-          'to'
-        );
-
+    // Fetch + save images in background
+    fetchAndSaveImagePair(coordinates, dateFrom, dateTo, request._id)
+      .then(async ({ imageFrom, imageTo }) => {
         await Request.findByIdAndUpdate(request._id, {
           imageFrom,
           imageTo,
-          status: 'Processing',
+          status: REQUEST_STATUS.PROCESSING,
         });
+        console.log("Images saved for request:", request._id);
+      })
+      .catch(async (err) => {
+        console.error("Sentinel fetch failed:", err.message);
+        await Request.findByIdAndUpdate(request._id, {
+          status: REQUEST_STATUS.FAILED,
+        });
+      });
 
-      } catch (err) {
-        console.error('GEE fetch failed:', err.message);
-        await Request.findByIdAndUpdate(request._id, { status: 'Failed' });
-      }
-    })();
-
-    res.status(201).json({ 
-      message: "Request submitted successfully", 
-      request 
+    res.status(201).json({
+      message: "Request submitted successfully",
+      request,
     });
-
   } catch (err) {
     next(err);
   }

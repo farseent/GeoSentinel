@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require("path");
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
@@ -15,6 +16,9 @@ app.use('/api/auth', require('./routes/auth'));
 // Maintenance mode check (before routes)
 app.use('/api/admin', require('./routes/admin'));
 app.use(checkMaintenance);
+
+// Serve uploaded images statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use('/api/user', require('./routes/user'));
