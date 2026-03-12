@@ -23,9 +23,11 @@ const DateRangePicker = ({ value, onChange, disabled = false }) => {
 
       if (start > end) {
         newErrors.dateOrder = 'Start date must be before end date';
-      } else if (diffDays > 365) {
-        newErrors.dateRange = 'Date range cannot exceed 365 days';
-      } else if (diffDays < 1) {
+      } 
+      // else if (diffDays > 365) {
+      //   newErrors.dateRange = 'Date range cannot exceed 365 days';
+      // }
+       else if (diffDays < 1) {
         newErrors.dateRange = 'Date range must be at least 1 day';
       }
     }
@@ -141,7 +143,7 @@ const DateRangePicker = ({ value, onChange, disabled = false }) => {
       </div>
 
       {/* Quick Date Range Buttons */}
-      {!disabled && (
+      {/* {!disabled && (
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
@@ -212,7 +214,7 @@ const DateRangePicker = ({ value, onChange, disabled = false }) => {
             Last Year
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Date Range Information */}
       {dateRangeInfo && (

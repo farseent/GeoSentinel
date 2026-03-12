@@ -4,7 +4,7 @@ import useAuth from '../hooks/useAuth';
 import useMap from '../hooks/useMap';
 import useRequests from '../hooks/useRequests';
 import MapContainer from '../components/map/MapContainer';
-import SearchBox from '../components/map/SearchBox';
+// import SearchBox from '../components/map/SearchBox';
 import DateRangePicker from '../components/map/DateRangePicker';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import SuccessMessage from "../components/common/SuccessMessage";
@@ -118,7 +118,7 @@ const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || i
                 Controls
               </h2>
 
-              <SearchBox />
+              {/* <SearchBox /> */}
 
               {/* Authentication Status */}
               {!isAuthenticated && (
@@ -275,12 +275,12 @@ const isSubmitDisabled = !aoi || !dateRange.startDate || !dateRange.endDate || i
             {/* Tips Section */}
             {isAuthenticated && (
               <div className="bg-white p-4 rounded-lg shadow-md">
-                <h3 className="text-sm font-semibold text-gray-800 mb-2">💡 Tips</h3>
+                {/* <h3 className="text-sm font-semibold text-gray-800 mb-2">💡 Tips</h3> */}
                 <ul className="space-y-1 text-xs text-gray-600">
                   {/* <li>• Use search to quickly navigate to locations</li> */}
-                  <li>• Keep AOI size reasonable for faster processing</li>
+                  {/* <li>• Keep AOI size reasonable for faster processing</li>
                   <li>• Larger areas may take longer to analyze</li>
-                  <li>• You can zoom in/out before drawing</li>
+                  <li>• You can zoom in/out before drawing</li> */}
                   {/* <li>• Use satellite view for better reference</li> */}
                 </ul>
               </div>
