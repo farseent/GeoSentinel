@@ -2,7 +2,10 @@ const Request = require("../models/Request");
 // const fetchGEEImage = require('../utils/fetchSatelliteImage');
 const { fetchAndSaveImagePair } = require("../utils/sentinelHub");
 const { REQUEST_STATUS } = require("../utils/constants");
+const axios = require("axios");
+const path = require("path");
 
+const MODEL_API_URL = process.env.MODEL_API_URL;
 // Create a new AOI request
 exports.createRequest = async (req, res, next) => {
   try {
@@ -26,27 +29,63 @@ exports.createRequest = async (req, res, next) => {
       status: REQUEST_STATUS.PENDING,
     });
 
-    // Fetch + save images in background
-    fetchAndSaveImagePair(coordinates, dateFrom, dateTo, request._id)
-      .then(async ({ imageFrom, imageTo }) => {
+    // Run everything in background
+    (async () => {
+      try {
+        // Step 1: Fetch Sentinel images
+        const { imageFrom, imageTo } = await fetchAndSaveImagePair(
+          coordinates, dateFrom, dateTo, request._id
+        );
+
+        // Update DB with image paths
         await Request.findByIdAndUpdate(request._id, {
           imageFrom,
           imageTo,
           status: REQUEST_STATUS.PROCESSING,
         });
-        console.log("Images saved for request:", request._id);
-      })
-      .catch(async (err) => {
-        console.error("Sentinel fetch failed:", err.message);
+
+        // Step 2: Build absolute paths for Flask
+        const serverRoot = path.join(__dirname, "..");
+        const abs1 = path.join(serverRoot, imageFrom);
+        const abs2 = path.join(serverRoot, imageTo);
+        const resultPath = path.join(
+          serverRoot, "uploads", "requests",
+          request._id.toString(), "result.png"
+        );
+
+        // Step 3: Call Flask model API
+        const modelResponse = await axios.post(`${MODEL_API_URL}/predict`, {
+          image1_path: abs1,
+          image2_path: abs2,
+          output_dir: path.join(serverRoot, "uploads", "requests", request._id.toString()),
+        });
+
+        const { stats } = modelResponse.data;
+        const requestId  = request._id.toString();
+
+        // Step 4: Update request as Completed
+        await Request.findByIdAndUpdate(request._id, {
+          resultUrl: `uploads/requests/${requestId}/post_map.png`, // best result
+          status: REQUEST_STATUS.COMPLETED,
+          completedAt: new Date(),
+        });
+
+        console.log(`Request ${request._id} completed. Change: ${modelResponse.data.change_percentage}%`);
+
+      } catch (err) {
+        console.error(`Request ${request._id} failed:`, err.message);
         await Request.findByIdAndUpdate(request._id, {
           status: REQUEST_STATUS.FAILED,
         });
-      });
+      }
+    })();
 
+    // Respond immediately
     res.status(201).json({
       message: "Request submitted successfully",
       request,
     });
+
   } catch (err) {
     next(err);
   }

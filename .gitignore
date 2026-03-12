@@ -232,3 +232,116 @@ $RECYCLE.BIN/
 *.f4b
 client/src/components/map/MapContainer2.jsx
 client/package-lock.json
+
+
+# .gitignore for Python ML / satellite-imagery project
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+eggs/
+pip-wheel-metadata/
+wheelhouse/
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+# if you want to keep notebooks tracked remove the previous line
+
+# Logs and runtime files
+*.log
+logs/
+run/
+*.pid
+*.seed
+
+# Model checkpoints and large artifacts
+models/
+checkpoints/
+checkpts/
+*.ckpt
+*.pth
+*.pt
+*.h5
+*.tflite
+*.onnx
+*.pb
+
+# Data and caches
+data/
+datasets/
+raw_data/
+processed_data/
+*.npy
+*.npz
+*.hdf5
+*.sqlite
+.cache/
+tmp/
+temp/
+
+# Experiment tracking & ML tools
+wandb/
+mlruns/
+tensorboard/
+runs/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# OneDrive / Windows temp
+~$*
+~*.tmp
+
+# Secrets and env files
+.env.local
+.env.*.local
+.env
+
+# Git hooks / local config
+.git-credentials
+.gitconfig.local
+.local/
+
+# Misc
+*.orig
+*.bak
+*.swp
+
+.github
+
+# End of file

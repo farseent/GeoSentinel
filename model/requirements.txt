@@ -1,0 +1,13 @@
+jupyter
+numpy
+imageio
+torch
+torchvision
+IPython
+scikit-image
+scipy
+matplotlib
+opencv-python
+streamlit
+flask
+Pillow
