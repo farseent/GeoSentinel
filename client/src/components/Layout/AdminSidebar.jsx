@@ -1,17 +1,15 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { authAPI } from '../../utils/api';
+import { NavLink } from 'react-router-dom';
+// import { authAPI } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext'; 
 
 const AdminSidebar = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
-    try {
-      await authAPI.logout();
-      navigate('/login');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
+      await logout();
+      window.location.href = '/login'; 
   };
 
   const navItems = [
@@ -51,13 +49,13 @@ const AdminSidebar = () => {
 
       {/* Bottom Actions */}
       <div className="p-4 border-t border-gray-800 space-y-2">
-        <button
+        {/* <button
           onClick={() => navigate('/')}
           className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 transition"
         >
           <span className="text-xl">🏠</span>
           <span className="font-medium">Go to Site</span>
-        </button>
+        </button> */}
         <button
           onClick={handleLogout}
           className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-red-900 transition"
