@@ -1,10 +1,12 @@
 // ProfileHeader.jsx
 import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateEmail } from '../../utils/validation';
 import { PencilIcon,  CheckIcon,  XMarkIcon, EnvelopeIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 const ProfileHeader = ({ user, onUpdateProfile }) => {
+  // const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -179,6 +181,7 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    disabled
                     className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                       errors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-200'
                     }`}
@@ -263,6 +266,14 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
                 year: 'numeric'
               }) : 'N/A'}
             />
+            {/* <div className="mt-6">
+              <button
+                onClick={() => navigate('/forgot-password')}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+              >
+                Change / Forgot Password
+              </button>
+            </div> */}
           </motion.div>
         )}
       </AnimatePresence>

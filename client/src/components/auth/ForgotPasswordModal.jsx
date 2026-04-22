@@ -299,7 +299,7 @@ export default function ForgotPasswordModal({ onClose }) {
               onClick={onClose}
               className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
             >
-              Back to login
+              Back
             </button>
           </div>
         )}
