@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Settings = require('../models/Settings');
 const jwt = require('jsonwebtoken');
-// const sendEmail = require('../utils/sendEmail'); 
+const sendEmail = require('../utils/sendEmail'); 
 const { JWT_SECRET, JWT_EXPIRES_IN, COOKIE_OPTIONS } = require('../config/jwt');
 const { validationResult } = require('express-validator');
 
@@ -181,63 +181,81 @@ exports.checkAuth = (req, res) => {
   });
 };
 
-// exports.forgotPassword = async (req, res) => {
-//   try {
-//     const { email } = req.body;
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-//     const user = await User.findOne({ email });
-//     if (!user) return res.status(400).json({ success: false, message: "User not found" });
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(400).json({ success: false, message: "User not found" });
 
-//     // Generate reset token valid for 1 hour
-//     const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-//     user.resetPasswordToken = resetToken;
-//     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
-//     await user.save();
+    user.resetOtp = otp;
+    user.resetOtpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
 
-//     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${encodeURIComponent(resetToken)}`;
-//     const html = `
-//       <h2>Password Reset Request - GeoSentinel</h2>
-//       <p>Hello ${user.name},</p>
-//       <p>You requested a password reset. Click the link below to reset your password:</p>
-//       <a href="${resetUrl}" target="_blank">${resetUrl}</a>
-//       <p>This link expires in 1 hour.</p>
-//     `;
+    const html = `
+      <h2>Password Reset OTP - GeoSentinel</h2>
+      <p>Hello ${user.name},</p>
+      <p>You requested a password reset. Use the OTP below to reset your password:</p>
+      <h1 style="letter-spacing: 8px; color: #2563eb;">${otp}</h1>
+      <p>This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+      <p>If you didn't request this, please ignore this email.</p>
+    `;
 
-//     await sendEmail(user.email, "Reset Your GeoSentinel Password", html);
+    await sendEmail(user.email, "Your GeoSentinel Password Reset OTP", html);
 
-//     res.status(200).json({ success: true, message: "Password reset link sent to your email." });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: "Error sending password reset link" });
-//   }
-// };
+    res.status(200).json({ success: true, message: "OTP sent to your email." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error sending OTP" });
+  }
+};
 
-// exports.resetPassword = async (req, res) => {
-//   try {
-//     const { token } = req.params;
-//     const { password } = req.body;
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
 
-//     const decoded = jwt.verify(decodeURIComponent(token), JWT_SECRET);
+    const user = await User.findOne({
+      email,
+      resetOtp: otp,
+      resetOtpExpires: { $gt: Date.now() },
+    });
 
-//     const user = await User.findOne({
-//       email: decoded.email,
-//       resetPasswordToken: token,
-//       resetPasswordExpires: { $gt: Date.now() },
-//     });
+    if (!user)
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
 
-//     if (!user) {
-//       return res.status(400).json({ success: false, message: "Invalid or expired token" });
-//     }
+    // OTP is valid — confirm to frontend so it can show the new password form
+    res.status(200).json({ success: true, message: "OTP verified successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "OTP verification failed" });
+  }
+};
 
-//     user.password = password; // Assuming your schema hashes it via pre-save middleware
-//     user.resetPasswordToken = undefined;
-//     user.resetPasswordExpires = undefined;
-//     await user.save();
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
 
-//     res.status(200).json({ success: true, message: "Password reset successful. You can now log in." });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(400).json({ success: false, message: "Invalid or expired reset link" });
-//   }
-// };
+    const user = await User.findOne({
+      email,
+      resetOtp: otp,
+      resetOtpExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+
+    user.password = password;           // pre-save hook hashes it automatically
+    user.resetOtp = undefined;
+    user.resetOtpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password reset successful. You can now log in." });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ success: false, message: "Password reset failed" });
+  }
+};
