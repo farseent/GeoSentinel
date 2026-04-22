@@ -4,7 +4,6 @@ import { validateEmail } from '../../utils/validation';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/ErrorMessage';
 import { Link } from 'react-router-dom';
-import ForgotPasswordModal from "./ForgotPasswordModal";
 
 const LoginForm = ({ onSuccess }) => {
   const { login, loading, error, clearError } = useAuth();
@@ -13,7 +12,6 @@ const LoginForm = ({ onSuccess }) => {
     password: ''
   });
   const [formErrors, setFormErrors] = useState({});
-  const [showForgot, setShowForgot] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -119,7 +117,7 @@ const LoginForm = ({ onSuccess }) => {
 
             <div className="text-right">
               <Link
-                onClick={() => setShowForgot(true)}
+                to="/forgot-password"
                 className="text-sm text-blue-600 hover:underline"
               >
                 Forgot Password?
@@ -128,9 +126,6 @@ const LoginForm = ({ onSuccess }) => {
 
           </div>
 
-          {showForgot && (
-            <ForgotPasswordModal onClose={() => setShowForgot(false)} />
-          )}
           
           <button
             type="submit"

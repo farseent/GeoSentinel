@@ -122,10 +122,7 @@ export default function ForgotPasswordModal({ onClose }) {
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
+    <div className="w-full" >
       <div className="bg-white rounded-lg shadow-md w-full max-w-sm p-6">
 
         {/* Step dots */}
