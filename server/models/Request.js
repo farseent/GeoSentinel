@@ -46,6 +46,11 @@ const requestSchema = new mongoose.Schema(
       enum: Object.values(REQUEST_STATUS),
       default: REQUEST_STATUS.PENDING,
     },
+    stats: {
+      total_pixels:      { type: Number, default: null },
+      changed_pixels:    { type: Number, default: null },
+      change_percentage: { type: Number, default: null },
+    },
 
     completedAt: { type: Date, default: null },
   },

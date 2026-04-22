@@ -93,10 +93,7 @@ def predict():
         I1 = io.imread(image1_path).astype('float')
         I2 = io.imread(image2_path).astype('float')
 
-        I1 = (I1 - I1.mean()) / I1.std()
-        I2 = (I2 - I2.mean()) / I2.std()
-
-        # Ensure 3 channels
+        # Ensure 3 channels FIRST (before normalization)
         if len(I1.shape) == 2:
             I1 = np.stack([I1, I1, I1], axis=-1)
         elif I1.shape[2] == 4:
@@ -106,6 +103,21 @@ def predict():
             I2 = np.stack([I2, I2, I2], axis=-1)
         elif I2.shape[2] == 4:
             I2 = I2[:, :, :3]
+
+        # Debug log — check if images are blank
+        print(f"[DEBUG] I1 → shape:{I1.shape} min:{I1.min():.4f} max:{I1.max():.4f} std:{I1.std():.4f}")
+        print(f"[DEBUG] I2 → shape:{I2.shape} min:{I2.min():.4f} max:{I2.max():.4f} std:{I2.std():.4f}")
+
+        # Safe normalization
+        def safe_normalize(arr):
+            std = arr.std()
+            if std == 0:
+                print(f"[WARNING] Image is uniform (std=0), returning zeros")
+                return np.zeros_like(arr)
+            return (arr - arr.mean()) / std
+
+        I1 = safe_normalize(I1)
+        I2 = safe_normalize(I2)
 
         # Match dimensions
         s1 = I1.shape

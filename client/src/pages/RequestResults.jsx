@@ -21,11 +21,11 @@ const RESULT_TABS = [
   { key: 'heatmap',        label: 'Heatmap',           description: 'Jet colormap intensity visualization' },
   { key: 'overlay_before', label: 'Overlay Before',    description: 'Changes highlighted on Date 1 (red)' },
   { key: 'overlay_after',  label: 'Overlay After',     description: 'Changes highlighted on Date 2 (green)' },
-  { key: 'contour_before', label: 'Contour Before',    description: 'Contour lines on Date 1' },
-  { key: 'contour_after',  label: 'Contour After',     description: 'Contour lines on Date 2' },
+  // { key: 'contour_before', label: 'Contour Before',    description: 'Contour lines on Date 1' },
+  // { key: 'contour_after',  label: 'Contour After',     description: 'Contour lines on Date 2' },
   { key: 'edges',          label: 'Edge Map',          description: 'Edge detection of changed areas' },
-  { key: 'diff_map',       label: 'Difference Map',    description: 'Raw pixel-level difference' },
-  { key: 'diff_heatmap',   label: 'Difference Heatmap',description: 'Difference map with hot colormap' },
+  // { key: 'diff_map',       label: 'Difference Map',    description: 'Raw pixel-level difference' },
+  // { key: 'diff_heatmap',   label: 'Difference Heatmap',description: 'Difference map with hot colormap' },
 ];
 
 const RequestResults = () => {
@@ -136,7 +136,7 @@ const RequestResults = () => {
         </div>
 
         {/* ── Statistics ── */}
-        {/* {request?.stats && (
+        {request?.stats && (
           <div className="grid grid-cols-3 gap-4">
             {[
               { label: 'Total Pixels',   value: request.stats.total_pixels?.toLocaleString() },
@@ -149,7 +149,7 @@ const RequestResults = () => {
               </div>
             ))}
           </div>
-        )} */}
+        )}
 
         {/* ── Sentinel Images ── */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
