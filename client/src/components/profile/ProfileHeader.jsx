@@ -1,6 +1,6 @@
 // ProfileHeader.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateEmail } from '../../utils/validation';
 import { PencilIcon,  CheckIcon,  XMarkIcon, EnvelopeIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
@@ -8,7 +8,7 @@ import { authAPI } from '../../utils/api';
 import { validatePassword, validatePasswordMatch, validateRequired } from '../../utils/validation';
 
 const ProfileHeader = ({ user, onUpdateProfile }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -477,7 +477,7 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 mt-2">
+            {/* <p className="text-xs text-gray-500 mt-2">
               Forgot your current password?{" "}
               <span
                 onClick={() => navigate('/forgot-password')}
@@ -485,7 +485,7 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
               >
                 Reset it here
               </span>
-            </p>
+            </p> */}
         
           </motion.div>
         )}
