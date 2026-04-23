@@ -1,12 +1,14 @@
 // ProfileHeader.jsx
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateEmail } from '../../utils/validation';
 import { PencilIcon,  CheckIcon,  XMarkIcon, EnvelopeIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { authAPI } from '../../utils/api';
+import { validatePassword, validatePasswordMatch, validateRequired } from '../../utils/validation';
 
 const ProfileHeader = ({ user, onUpdateProfile }) => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -14,6 +16,15 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,6 +78,71 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
     }
   };
 
+  const handleChangePassword = async () => {
+  const newErrors = {};
+
+  // Current password validation
+  const currentCheck = validateRequired(passwordData.currentPassword, "Current password");
+  if (!currentCheck.isValid) {
+    newErrors.currentPassword = currentCheck.message;
+  }
+
+  // New password validation
+  const passwordCheck = validatePassword(passwordData.newPassword);
+  if (!passwordCheck.isValid) {
+    newErrors.newPassword = passwordCheck.message;
+  }
+
+  // Confirm password validation
+  const matchCheck = validatePasswordMatch(
+    passwordData.newPassword,
+    passwordData.confirmPassword
+  );
+  if (!matchCheck.isValid) {
+    newErrors.confirmPassword = matchCheck.message;
+  }
+
+  setPasswordErrors(newErrors);
+
+  if (Object.keys(newErrors).length > 0) return;
+
+  try {
+    setPasswordLoading(true);
+
+    const res = await authAPI.changePassword(
+      passwordData.currentPassword,
+      passwordData.newPassword
+    );
+
+    // ✅ Show success message
+    setPasswordMessage({
+      type: "success",
+      text: res.data.message || "Password updated successfully"
+    });
+
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+
+    setShowPasswordForm(false);
+
+  } catch (err) {
+    setPasswordMessage({
+      type: "error",
+      text: err.response?.data?.message || "Failed to update password"
+    });
+
+    setPasswordErrors({
+      general: err.response?.data?.message
+    });
+
+  } finally {
+    setPasswordLoading(false);
+  }
+  };
+
   const handleCancel = () => {
     setFormData({
       name: user?.name || '',
@@ -117,18 +193,32 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
         </div>
         
         {!isEditing && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsEditing(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
-          >
-            <PencilIcon className="h-4 w-4" />
-            <span>Edit Profile</span>
-          </motion.button>
+          <div className="flex gap-3">
+            {/* Edit Profile */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsEditing(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-md"
+            >
+              <PencilIcon className="h-4 w-4" />
+              <span>Edit Profile</span>
+            </motion.button>
+
+            {/* Change Password */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200"
+            >
+              <ShieldCheckIcon className="h-4 w-4" />
+              <span>Change Password</span>
+            </motion.button>
+          </div>
         )}
       </div>
-
+        
       <AnimatePresence mode="wait">
         {isEditing ? (
           <motion.form
@@ -266,17 +356,141 @@ const ProfileHeader = ({ user, onUpdateProfile }) => {
                 year: 'numeric'
               }) : 'N/A'}
             />
-            {/* <div className="mt-6">
-              <button
-                onClick={() => navigate('/forgot-password')}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
-              >
-                Change / Forgot Password
-              </button>
-            </div> */}
           </motion.div>
         )}
       </AnimatePresence>
+          {passwordMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className={`flex items-center justify-between p-3 rounded-lg text-sm font-medium border ${
+                passwordMessage.type === "success"
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-red-50 text-red-700 border-red-200"
+              }`}
+            >
+              <span>{passwordMessage.text}</span>
+
+              {/* ❌ Close Button */}
+              <button
+                onClick={() => setPasswordMessage(null)}
+                className="ml-4 text-gray-400 hover:text-gray-600 transition"
+              >
+                <XMarkIcon className="h-4 w-4" />
+              </button>
+            </motion.div>
+          )}
+      <AnimatePresence>
+        {showPasswordForm && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-200"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Change Password
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              {/* Current Password */}
+              <input
+                type="password"
+                placeholder="Current Password"
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 ${
+                  passwordErrors.currentPassword
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-gray-200 focus:ring-blue-500'
+                }`}
+                value={passwordData.currentPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                }
+              />
+
+              {passwordErrors.currentPassword && (
+                <p className="text-red-500 text-xs mt-1">
+                  {passwordErrors.currentPassword}
+                </p>
+              )}
+
+              {/* New Password */}
+              <input
+                type="password"
+                placeholder="New Password"
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  passwordErrors.newPassword
+                    ? 'border-red-300'
+                    : 'border-gray-200'
+                }`}
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, newPassword: e.target.value })
+                }
+              />
+
+              {passwordErrors.newPassword && (
+                <p className="text-red-500 text-xs mt-1">
+                  {passwordErrors.newPassword}
+                </p>
+              )}
+
+              {/* Confirm Password */}
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                className={`w-full px-4 py-3 border rounded-xl ${
+                  passwordErrors.confirmPassword
+                    ? 'border-red-300'
+                    : 'border-gray-200'
+                }`}
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                }
+                />
+
+                {passwordErrors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">
+                  {passwordErrors.confirmPassword}
+                </p>
+                )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-5">
+              <button
+                onClick={handleChangePassword}
+                disabled={passwordLoading}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-md"
+              >
+                {passwordLoading ? "Updating..." : "Update Password"}
+              </button>
+
+              <button
+                onClick={() => setShowPasswordForm(false)}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl"
+              >
+                Cancel
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-2">
+              Forgot your current password?{" "}
+              <span
+                onClick={() => navigate('/forgot-password')}
+                className="text-blue-600 cursor-pointer hover:underline"
+              >
+                Reset it here
+              </span>
+            </p>
+        
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
     </div>
   );
 };

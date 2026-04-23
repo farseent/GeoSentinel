@@ -78,10 +78,14 @@ export const authAPI = {
   },
 
   verifyOtp: (email, otp) =>
-  api.post('/auth/verify-otp', { email, otp }),
+    api.post('/auth/verify-otp', { email, otp }),
 
   resetPassword: (email, otp, password) =>
-  api.post('/auth/reset-password', { email, otp, password }),
+    api.post('/auth/reset-password', { email, otp, password }),
+
+  changePassword: (currentPassword, newPassword) => {
+    return api.put('/auth/change-password', { currentPassword, newPassword });
+  }
 };
 
 // AOI Requests API endpoints

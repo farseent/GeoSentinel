@@ -259,3 +259,64 @@ exports.resetPassword = async (req, res) => {
     res.status(400).json({ success: false, message: "Password reset failed" });
   }
 };
+
+exports.changePassword = async (req, res) => {
+  try {
+    const userId = req.user._id; // comes from authMiddleware
+    const { currentPassword, newPassword } = req.body;
+
+    // 1. Validate input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
+    // 2. Get user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 3. Check current password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect"
+      });
+    }
+
+    // 4. Prevent same password reuse (optional but good)
+    const isSame = await user.matchPassword(newPassword);
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be different from current password"
+      });
+    }
+
+    // 5. Update password
+    user.password = newPassword; // 🔥 your pre-save hook will hash this
+    await user.save();
+
+    // 6. (Recommended) Logout user
+    // res.clearCookie('token', COOKIE_OPTIONS);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully."
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update password"
+    });
+  }
+};
