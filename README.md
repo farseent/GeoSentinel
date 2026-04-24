@@ -99,7 +99,6 @@ npm start
 ```bash
 cd model
 pip install -r requirements.txt
-python app.py
 ```
 Start the model:
 
