@@ -18,9 +18,11 @@ exports.signup = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
 
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, dob, address } = req.body;
     let existingUser  = await User.findOne({ email });
     if (existingUser ) return res.status(400).json({ success: false, message: 'Email already registered' });
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) return res.status(400).json({ success: false, message: 'Phone number already registered' })
 
         // Generate email verification token (valid for 24 hours)
     // const verificationToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1d' });
@@ -30,6 +32,9 @@ exports.signup = async (req, res, next) => {
       name,
       email,
       password,
+      phone,
+      dob,
+      address
       // verificationToken,
       // verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000,
       // isVerified: false,
@@ -48,7 +53,7 @@ exports.signup = async (req, res, next) => {
 
     // await sendEmail(email, 'Verify Your GeoSentinel Account', html);
 
-    res.status(201).json({ success: true, message: 'Signup successful! Please verify your email before logging in.', user: { id: user._id, name, email } });
+    res.status(201).json({ success: true, message: 'Signup successful! Please verify your email before logging in.', user: { id: user._id, name, email, } });
   } catch (err) {
     console.error(err);
     next(err);

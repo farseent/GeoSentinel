@@ -65,25 +65,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (name, email, password) => {
+  const signup = async (formData) => {
     try {
       setError(null);
       setLoading(true);
-      
-      const response = await authAPI.signup({ name, email, password });
-      
+
+      const response = await authAPI.signup(formData);
+
       if (response.data.success) {
-        // setUser(response.data.user);
-        return { success: true, message: response.data.message  };
+        return {
+          success: true,
+          message: response.data.message
+        };
       }
+
+      return { success: false };
+
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Signup failed';
+      const errorMessage =
+        error.response?.data?.message || 'Signup failed';
+
       setError(errorMessage);
-      return { success: false, message: errorMessage };
+
+      return {
+        success: false,
+        message: errorMessage
+      };
     } finally {
       setLoading(false);
     }
-  };
+    };
 
   const logout = async () => {
     try {
