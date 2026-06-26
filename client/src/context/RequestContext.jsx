@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { requestsAPI } from "../utils/api"; // ✅ import your axios API file
+import useAuth from "../hooks/useAuth"; // ✅ Need auth state to conditionally fetch requests
 
 const RequestContext = createContext();
 
@@ -74,27 +75,35 @@ export const RequestProvider = ({ children }) => {
   };
 
 
-const getRequestStats = useCallback(async () => {
-  setLoadingStats(true);
-  setErrorMessage(null);
-  try {
-    const res = await requestsAPI.getRequestStats(); // ✅ Axios returns res.data directly
-    setStats(res.data);
-    return res.data;
-  } catch (err) {
-    const msg = err.response?.data?.message || err.message;
-    setErrorMessage(msg);
-    return null;
-  } finally {
-    setLoadingStats(false);
-  }
-}, []);
+  const getRequestStats = useCallback(async () => {
+    setLoadingStats(true);
+    setErrorMessage(null);
+    try {
+      const res = await requestsAPI.getRequestStats(); // ✅ Axios returns res.data directly
+      setStats(res.data);
+      return res.data;
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      setErrorMessage(msg);
+      return null;
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
 
 
-  // ✅ Fetch requests on mount
+  const { isAuthenticated } = useAuth(); // ✅ Get authentication state
+  
+  // ✅ Fetch requests conditionally
   useEffect(() => {
-    fetchMyRequests();
-  }, [fetchMyRequests]);
+    if (isAuthenticated) {
+      setErrorMessage(null); // Clear errors when user logs in
+      fetchMyRequests();
+    } else {
+      setRequests([]);
+      setErrorMessage("Not authenticated. Please log in to manage requests."); // Show banner when logged out
+    }
+  }, [isAuthenticated, fetchMyRequests]);
 
   return (
     <RequestContext.Provider
