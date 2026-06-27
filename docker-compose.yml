@@ -16,7 +16,7 @@ services:
       - "5001:5001"
 
   server:
-    image: farseent247/geosentinel-server:latest
+    image: farseen247/geosentinel-server:latest
     container_name: geosentinel-server
     restart: unless-stopped
     ports:
