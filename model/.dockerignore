@@ -1,0 +1,7 @@
+*.pth
+*.pt
+*.h5
+*.ckpt
+__pycache__
+*.pyc
+.git

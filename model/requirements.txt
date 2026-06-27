@@ -1,13 +1,10 @@
-jupyter
 numpy
 imageio
-torch
-torchvision
-IPython
 scikit-image
 scipy
 matplotlib
 opencv-python
-streamlit
 flask
 Pillow
+torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
