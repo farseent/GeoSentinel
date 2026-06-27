@@ -21,13 +21,13 @@ GeoSentinel is a full-stack web application that lets users submit geospatial ch
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React, Leaflet, Tailwind CSS |
-| Backend | Node.js, Express, MongoDB, Mongoose |
-| Auth | JWT (HttpOnly cookies), RBAC |
-| AI Microservice | Python, Flask, FresUNet model |
-| Satellite Data | Copernicus Data Space API (OAuth2), Sentinel-2 |
+| Layer           | Technology                                     |
+| --------------- | ---------------------------------------------- |
+| Frontend        | React, Leaflet, Tailwind CSS                   |
+| Backend         | Node.js, Express, MongoDB, Mongoose            |
+| Auth            | JWT (HttpOnly cookies), RBAC                   |
+| AI Microservice | Python, Flask, FresUNet model                  |
+| Satellite Data  | Copernicus Data Space API (OAuth2), Sentinel-2 |
 
 ---
 
@@ -100,6 +100,7 @@ npm start
 cd model
 pip install -r requirements.txt
 ```
+
 Start the model:
 
 ```bash
@@ -156,17 +157,37 @@ Each completed request generates up to 14 visual outputs, including:
 
 ## Environment Variables Summary
 
-| Variable | Location | Description |
-|---|---|---|
-| `PORT` | server | Express server port |
-| `MONGO_URI` | server | MongoDB connection string |
-| `JWT_SECRET` | server | Secret for JWT signing |
-| `CLIENT_URL` | server | Allowed CORS origin |
-| `COPERNICUS_CLIENT_ID` | server | Copernicus OAuth client ID |
-| `COPERNICUS_CLIENT_SECRET` | server | Copernicus OAuth client secret |
-| `REACT_APP_API_URL` | client | Base URL of the backend API |
+| Variable                   | Location | Description                    |
+| -------------------------- | -------- | ------------------------------ |
+| `PORT`                     | server   | Express server port            |
+| `MONGO_URI`                | server   | MongoDB connection string      |
+| `JWT_SECRET`               | server   | Secret for JWT signing         |
+| `CLIENT_URL`               | server   | Allowed CORS origin            |
+| `COPERNICUS_CLIENT_ID`     | server   | Copernicus OAuth client ID     |
+| `COPERNICUS_CLIENT_SECRET` | server   | Copernicus OAuth client secret |
+| `REACT_APP_API_URL`        | client   | Base URL of the backend API    |
 
 ---
+
+## 🐳 Running with Docker
+
+### Prerequisites
+
+- Docker Desktop installed
+
+### Setup
+
+1. Clone the repo
+2. Create `server/.env` from `server/.env.example`
+3. Run:
+
+```bash
+   docker compose up
+```
+
+4. Open http://localhost:3000
+
+Images are pulled automatically from Docker Hub.
 
 ## Research Background
 
