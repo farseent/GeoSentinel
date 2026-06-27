@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: geosentinel-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  model:
+    build: ./model
+    container_name: geosentinel-model
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    # If your weights file is on disk but not in repo, mount it:
+    # volumes:
+    #   - ./model/weights:/app/weights
+
+  server:
+    build: ./server
+    container_name: geosentinel-server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env # your existing .env file — Docker reads it directly
+    environment:
+      # Override only the URLs that change inside Docker
+      - MONGODB_URI=mongodb://mongo:27017/geosentinel
+      - MODEL_API_URL=http://model:5001
+      - CLIENT_URL=http://localhost:3000
+    depends_on:
+      - mongo
+      - model
+
+  client:
+    build: ./client
+    container_name: geosentinel-client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000/api
+      - REACT_APP_BACKEND_URL=http://localhost:5000
+    depends_on:
+      - server
+
+volumes:
+  mongo-data:
