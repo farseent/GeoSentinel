@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useSearchParams } from 'react-router-dom';

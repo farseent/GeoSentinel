@@ -1,5 +1,5 @@
 // FILE: client/src/pages/admin/AdminDashboard.jsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';

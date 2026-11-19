@@ -1,10 +1,10 @@
 // RequestsList.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorMessage from '../common/ErrorMessage';
-import { ChevronDownIcon, ArrowPathIcon, MapIcon, DocumentArrowDownIcon, DocumentDuplicateIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ArrowPathIcon, DocumentArrowDownIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 
 const RequestsList = ({ requests, loading, error, onRefresh }) => {
   const [selectedRequest, setSelectedRequest] = useState(null);
