@@ -30,7 +30,7 @@
 
 /* Draw Rectangle Icon */
 .leaflet-draw-draw-rectangle {
-  background-image: url('./../../public/icons/rectangle-icon.svg') !important;
+  background-image: url('../assets/icons/rectangle-icon.svg') !important;
 }
 
 .leaflet-draw-draw-rectangle:hover {
@@ -40,7 +40,7 @@
 
 /* Edit Icon */
 .leaflet-draw-edit-edit {
-  background-image: url('./../../public/icons/edit-icon.svg') !important;
+  background-image: url('../assets/icons/edit-icon.svg') !important;
 }
 
 .leaflet-draw-edit-edit:hover {
@@ -50,7 +50,7 @@
 
 /* Delete Icon */
 .leaflet-draw-edit-remove {
-  background-image: url('./../../public/icons/delete-icon.svg') !important;
+  background-image: url('../assets/icons/delete-icon.svg') !important;
 }
 
 .leaflet-draw-edit-remove:hover {
