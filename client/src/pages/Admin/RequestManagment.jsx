@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -18,21 +18,21 @@ const RequestManagment = () => {
   const [newStatus, setNewStatus] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
 
-  useEffect(() => {
-    fetchRequests();
-  }, [page, statusFilter]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
+
       const params = {
         page,
         limit: 10,
         status: statusFilter
       };
+
       if (search) params.search = search;
 
       const response = await adminAPI.getAllRequests(params);
+
       setRequests(response.data.data.requests);
       setTotalPages(response.data.data.pagination.pages);
       setError('');
@@ -41,12 +41,16 @@ const RequestManagment = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, statusFilter, search]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchRequests();
+    // Fetching is handled by useEffect.
   };
 
   const openStatusModal = (request) => {

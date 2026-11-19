@@ -1,5 +1,4 @@
-// FILE: client/src/pages/admin/AdminDashboard.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -10,15 +9,12 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
-
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminAPI.getDashboardStats();
       setStats(response.data.data);
+      setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch statistics');
       if (err.response?.status === 403) {
@@ -27,7 +23,11 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
 
   const getStatusColor = (status) => {
     const colors = {

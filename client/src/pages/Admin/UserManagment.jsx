@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { adminAPI } from '../../utils/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useSearchParams } from 'react-router-dom';
@@ -105,21 +105,28 @@ const UserManagement = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [viewUser, setViewUser] = useState(null); // ← new state for detail modal
 
-  useEffect(() => {
-    fetchUsers();
-  }, [page, statusFilter]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const params = { page, limit: 10, status: statusFilter };
-      if (search) params.search = search;
+
+      const params = {
+        page,
+        limit: 10,
+        status: statusFilter,
+      };
+
+      if (appliedSearch) {
+        params.search = appliedSearch;
+      }
+
       const response = await adminAPI.getAllUsers(params);
+
       setUsers(response.data.data.users);
       setTotalPages(response.data.data.pagination.pages);
       setError('');
@@ -128,12 +135,16 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, statusFilter, appliedSearch]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchUsers();
+    setAppliedSearch(search.trim());
   };
 
   const toggleUserBlock = async (userId, currentStatus) => {
